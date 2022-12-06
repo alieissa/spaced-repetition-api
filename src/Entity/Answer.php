@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Card\CardEntity;
 use App\Repository\AnswerRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -28,8 +29,8 @@ class Answer
     private $note;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Card::class, inversedBy="answers")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\ManyToOne(targetEntity=CardEntity::class, inversedBy="answers")
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      */
     private $card;
 
@@ -62,12 +63,12 @@ class Answer
         return $this;
     }
 
-    public function getCard(): ?Card
+    public function getCard(): ?CardEntity
     {
         return $this->card;
     }
 
-    public function setCard(?Card $card): self
+    public function setCard(?CardEntity $card): self
     {
         $this->card = $card;
 

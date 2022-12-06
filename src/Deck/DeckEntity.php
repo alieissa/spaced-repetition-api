@@ -1,16 +1,17 @@
 <?php
 
-namespace App\Entity;
+namespace App\Deck;
 
-use App\Repository\DeckRepository;
+use App\Card\CardEntity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass=DeckRepository::class)
+ * @ORM\Table(name="deck")
  */
-class Deck
+class DeckEntity
 {
     /**
      * @ORM\Id
@@ -25,6 +26,7 @@ class Deck
     private $name;
 
     /**
+     * @ORM\GeneratedValue
      * @ORM\Column(type="datetime_immutable")
      */
     private $createdAt;
@@ -35,18 +37,13 @@ class Deck
     private $updatedAt;
 
     /**
-     * @ORM\OneToMany(targetEntity=Card::class, mappedBy="deck_id")
+     * @ORM\OneToMany(targetEntity=CardEntity::class, mappedBy="deck")
      */
     private $cards;
 
     public function __construct()
     {
         $this->cards = new ArrayCollection();
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
     }
 
     public function getName(): ?string
@@ -86,29 +83,34 @@ class Deck
     }
 
     /**
-     * @return Collection<int, Card>
+     * @return Collection<int, CardEntity>
      */
     public function getCards(): Collection
     {
         return $this->cards;
     }
 
-    public function addCard(Card $card): self
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function addCard(CardEntity $card): self
     {
         if (!$this->cards->contains($card)) {
             $this->cards[] = $card;
-            $card->setDeckId($this);
+            $card->setDeck($this);
         }
 
         return $this;
     }
 
-    public function removeCard(Card $card): self
+    public function removeCard(CardEntity $card): self
     {
         if ($this->cards->removeElement($card)) {
             // set the owning side to null (unless already changed)
-            if ($card->getDeckId() === $this) {
-                $card->setDeckId(null);
+            if ($card->getDeck() === $this) {
+                $card->setDeck(null);
             }
         }
 

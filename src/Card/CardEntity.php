@@ -1,16 +1,23 @@
 <?php
 
-namespace App\Entity;
+namespace App\Card;
 
-use App\Repository\CardRepository;
+use App\Deck\DeckEntity;
+use App\Entity\Answer;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\Ignore;
+use Symfony\Component\Serializer\Annotation\SerializedName;
+use Symfony\Component\Serializer\Annotation\SerializedPath;
+
 
 /**
  * @ORM\Entity(repositoryClass=CardRepository::class)
+ * @ORM\Table(name="card")
  */
-class Card
+class CardEntity
 {
     /**
      * @ORM\Id
@@ -42,7 +49,7 @@ class Card
     /**
      * @ORM\Column(type="date")
      */
-    private $next_practice_date;
+    private $nextPracticeDate;
 
     /**
      * @ORM\Column(type="datetime_immutable")
@@ -55,24 +62,27 @@ class Card
     private $updatedAt;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Deck::class, inversedBy="cards")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\ManyToOne(targetEntity=DeckEntity::class, inversedBy="cards")
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
+     * @Ignore()
      */
     private $deck;
 
     /**
      * @ORM\OneToMany(targetEntity=Answer::class, mappedBy="card")
+     *
      */
     private $answers;
+
+    /**
+     * @ORM\Column(type="text")
+     *
+     */
+    private $question;
 
     public function __construct()
     {
         $this->answers = new ArrayCollection();
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
     }
 
     public function getEasiness(): ?float
@@ -125,12 +135,12 @@ class Card
 
     public function getNextPracticeDate(): ?\DateTimeInterface
     {
-        return $this->next_practice_date;
+        return $this->nextPracticeDate;
     }
 
-    public function setNextPracticeDate(\DateTimeInterface $next_practice_date): self
+    public function setNextPracticeDate(\DateTimeInterface $nextPracticeDate): self
     {
-        $this->next_practice_date = $next_practice_date;
+        $this->nextPracticeDatee = $nextPracticeDate;
 
         return $this;
     }
@@ -155,18 +165,6 @@ class Card
     public function setUpdatedAt(?\DateTimeImmutable $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
-
-        return $this;
-    }
-
-    public function getDeck(): ?Deck
-    {
-        return $this->deck;
-    }
-
-    public function setDeck(?Deck $deck): self
-    {
-        $this->deck = $deck;
 
         return $this;
     }
@@ -197,6 +195,48 @@ class Card
                 $answer->setCard(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getQuestion(): ?string
+    {
+        return $this->question;
+    }
+
+    public function setQuestion(string $question): self
+    {
+        $this->question = $question;
+
+        return $this;
+    }
+
+    /**
+     * This getter is to ensure that we don't not a circular reference
+     * when serializing a CardEntity. Instead of an entire deck we return
+     * its id
+     *
+     * @Groups({"deck:id"})
+     * @SerializedName("deckId")
+     */
+    public function getDeckId(): ?int
+    {
+        return $this->getDeck()->getId();
+    }
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getDeck(): ?DeckEntity
+    {
+        return $this->deck;
+    }
+
+    public function setDeck(?DeckEntity $deck): self
+    {
+        $this->deck = $deck;
 
         return $this;
     }

@@ -1,27 +1,26 @@
 <?php
 
-namespace App\Repository;
+namespace App\Deck;
 
-use App\Entity\Deck;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Deck>
+ * @extends ServiceEntityRepository<DeckEntity>
  *
- * @method Deck|null find($id, $lockMode = null, $lockVersion = null)
- * @method Deck|null findOneBy(array $criteria, array $orderBy = null)
- * @method Deck[]    findAll()
- * @method Deck[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method DeckEntity|null find($id, $lockMode = null, $lockVersion = null)
+ * @method DeckEntity|null findOneBy(array $criteria, array $orderBy = null)
+ * @method DeckEntity[]    findAll()
+ * @method DeckEntity[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class DeckRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Deck::class);
+        parent::__construct($registry, DeckEntity::class);
     }
 
-    public function add(Deck $entity, bool $flush = false): void
+    public function add(DeckEntity $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -30,7 +29,7 @@ class DeckRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(Deck $entity, bool $flush = false): void
+    public function remove(DeckEntity $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 

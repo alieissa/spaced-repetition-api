@@ -1,31 +1,31 @@
 <?php
 
-namespace App\Factory;
+namespace App\Card;
 
-use App\Entity\Card;
-use App\Repository\CardRepository;
-use Zenstruck\Foundry\RepositoryProxy;
+//use App\Card\CardEntity;
+//use App\Card\CardRepository;
 use Zenstruck\Foundry\ModelFactory;
 use Zenstruck\Foundry\Proxy;
+use Zenstruck\Foundry\RepositoryProxy;
 
 /**
- * @extends ModelFactory<Card>
+ * @extends ModelFactory<CardEntity>
  *
- * @method static Card|Proxy createOne(array $attributes = [])
- * @method static Card[]|Proxy[] createMany(int $number, array|callable $attributes = [])
- * @method static Card[]|Proxy[] createSequence(array|callable $sequence)
- * @method static Card|Proxy find(object|array|mixed $criteria)
- * @method static Card|Proxy findOrCreate(array $attributes)
- * @method static Card|Proxy first(string $sortedField = 'id')
- * @method static Card|Proxy last(string $sortedField = 'id')
- * @method static Card|Proxy random(array $attributes = [])
- * @method static Card|Proxy randomOrCreate(array $attributes = [])
- * @method static Card[]|Proxy[] all()
- * @method static Card[]|Proxy[] findBy(array $attributes)
- * @method static Card[]|Proxy[] randomSet(int $number, array $attributes = [])
- * @method static Card[]|Proxy[] randomRange(int $min, int $max, array $attributes = [])
+ * @method static CardEntity|Proxy createOne(array $attributes = [])
+ * @method static CardEntity[]|Proxy[] createMany(int $number, array|callable $attributes = [])
+ * @method static CardEntity[]|Proxy[] createSequence(array|callable $sequence)
+ * @method static CardEntity|Proxy find(object|array|mixed $criteria)
+ * @method static CardEntity|Proxy findOrCreate(array $attributes)
+ * @method static CardEntity|Proxy first(string $sortedField = 'id')
+ * @method static CardEntity|Proxy last(string $sortedField = 'id')
+ * @method static CardEntity|Proxy random(array $attributes = [])
+ * @method static CardEntity|Proxy randomOrCreate(array $attributes = [])
+ * @method static CardEntity[]|Proxy[] all()
+ * @method static CardEntity[]|Proxy[] findBy(array $attributes)
+ * @method static CardEntity[]|Proxy[] randomSet(int $number, array $attributes = [])
+ * @method static CardEntity[]|Proxy[] randomRange(int $min, int $max, array $attributes = [])
  * @method static CardRepository|RepositoryProxy repository()
- * @method Card|Proxy create(array|callable $attributes = [])
+ * @method CardEntity|Proxy create(array|callable $attributes = [])
  */
 final class CardFactory extends ModelFactory
 {
@@ -36,10 +36,16 @@ final class CardFactory extends ModelFactory
         // TODO inject services if required (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services)
     }
 
+    protected static function getClass(): string
+    {
+        return CardEntity::class;
+    }
+
     protected function getDefaults(): array
     {
         return [
             // TODO add your default values here (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories)
+            'question' => self::faker()->text(),
             'easiness' => self::faker()->randomFloat(1, 1.3, 2.5),
             'quality' => self::faker()->numberBetween(0, 5),
             // TODO Use algorithm to calculate interval
@@ -56,10 +62,5 @@ final class CardFactory extends ModelFactory
         // see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#initialization
         return $this// ->afterInstantiate(function(Card $card): void {})
             ;
-    }
-
-    protected static function getClass(): string
-    {
-        return Card::class;
     }
 }
