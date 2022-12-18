@@ -4,6 +4,8 @@ namespace App\Card;
 
 use App\Deck\DeckEntity;
 use App\Entity\Answer;
+use DateTimeImmutable;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -29,22 +31,22 @@ class CardEntity
     /**
      * @ORM\Column(type="float")
      */
-    private $easiness;
+    private $easiness = 1.2;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $quality;
+    private $quality = 1;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $interval;
+    private $interval = 1;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $repetitions;
+    private $repetitions = 1;
 
     /**
      * @ORM\Column(type="date")
@@ -52,7 +54,7 @@ class CardEntity
     private $nextPracticeDate;
 
     /**
-     * @ORM\Column(type="datetime_immutable")
+     * @ORM\Column(type="datetime_immutable",  options={"default": "CURRENT_TIMESTAMP"})
      */
     private $createdAt;
 
@@ -69,10 +71,10 @@ class CardEntity
     private $deck;
 
     /**
-     * @ORM\OneToMany(targetEntity=Answer::class, mappedBy="card")
+     * @ORM\OneToMany(targetEntity=Answer::class, mappedBy="card", cascade={"all"})
      *
      */
-    private $answers;
+    private $answers = [];
 
     /**
      * @ORM\Column(type="text")
@@ -133,36 +135,36 @@ class CardEntity
         return $this;
     }
 
-    public function getNextPracticeDate(): ?\DateTimeInterface
+    public function getNextPracticeDate(): ?DateTimeInterface
     {
         return $this->nextPracticeDate;
     }
 
-    public function setNextPracticeDate(\DateTimeInterface $nextPracticeDate): self
-    {
-        $this->nextPracticeDatee = $nextPracticeDate;
+    public function setNextPracticeDate(DateTimeInterface $nextPracticeDate
+    ): self {
+        $this->nextPracticeDate = $nextPracticeDate;
 
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
+    public function getCreatedAt(): ?DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): self
+    public function setCreatedAt(DateTimeImmutable $createdAt): self
     {
         $this->createdAt = $createdAt;
 
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTimeImmutable
+    public function getUpdatedAt(): ?DateTimeImmutable
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): self
+    public function setUpdatedAt(?DateTimeImmutable $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
 

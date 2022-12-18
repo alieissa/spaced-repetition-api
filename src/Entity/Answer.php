@@ -5,6 +5,9 @@ namespace App\Entity;
 use App\Card\CardEntity;
 use App\Repository\AnswerRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\Ignore;
+use Symfony\Component\Serializer\Annotation\SerializedName;
 
 /**
  * @ORM\Entity(repositoryClass=AnswerRepository::class)
@@ -29,15 +32,11 @@ class Answer
     private $note;
 
     /**
-     * @ORM\ManyToOne(targetEntity=CardEntity::class, inversedBy="answers")
-     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
+     * @ORM\ManyToOne(targetEntity=CardEntity::class, inversedBy="answers", cascade={"all"})
+     * @ORM\JoinColumn(nullable=false)
+     * @Ignore()
      */
     private $card;
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
 
     public function getContent(): ?string
     {
@@ -61,6 +60,25 @@ class Answer
         $this->note = $note;
 
         return $this;
+    }
+
+
+    /**
+     * This getter is to ensure that we don't not a circular reference
+     * when serializing an AnswerEntity. Instead of an entire card we return
+     * its id
+     *
+     * @Groups({"card:id"})
+     * @SerializedName("cardId")
+     */
+    public function getCardId()
+    {
+        return $this->getCard()->getId();
+    }
+
+    public function getId(): ?int
+    {
+        return $this->id;
     }
 
     public function getCard(): ?CardEntity
