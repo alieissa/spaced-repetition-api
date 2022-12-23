@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Entity;
+namespace App\Answer;
 
 use App\Card\CardEntity;
-use App\Repository\AnswerRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\Ignore;
@@ -11,8 +10,9 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
 
 /**
  * @ORM\Entity(repositoryClass=AnswerRepository::class)
+ * @ORM\Table(name="answer")
  */
-class Answer
+class AnswerEntity
 {
     /**
      * @ORM\Id
@@ -32,7 +32,7 @@ class Answer
     private $note;
 
     /**
-     * @ORM\ManyToOne(targetEntity=CardEntity::class, inversedBy="answers", cascade={"all"})
+     * @ORM\ManyToOne(targetEntity=CardEntity::class, inversedBy="answers")
      * @ORM\JoinColumn(nullable=false)
      * @Ignore()
      */

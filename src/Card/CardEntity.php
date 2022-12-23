@@ -2,8 +2,8 @@
 
 namespace App\Card;
 
+use App\Answer\AnswerEntity;
 use App\Deck\DeckEntity;
-use App\Entity\Answer;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -71,7 +71,7 @@ class CardEntity
     private $deck;
 
     /**
-     * @ORM\OneToMany(targetEntity=Answer::class, mappedBy="card", cascade={"all"})
+     * @ORM\OneToMany(targetEntity=AnswerEntity::class, mappedBy="card", cascade={"all"})
      *
      */
     private $answers = [];
@@ -172,14 +172,14 @@ class CardEntity
     }
 
     /**
-     * @return Collection<int, Answer>
+     * @return Collection<int, AnswerEntity >
      */
     public function getAnswers(): Collection
     {
         return $this->answers;
     }
 
-    public function addAnswer(Answer $answer): self
+    public function addAnswer(AnswerEntity $answer): self
     {
         if (!$this->answers->contains($answer)) {
             $this->answers[] = $answer;
@@ -189,7 +189,7 @@ class CardEntity
         return $this;
     }
 
-    public function removeAnswer(Answer $answer): self
+    public function removeAnswer(AnswerEntity $answer): self
     {
         if ($this->answers->removeElement($answer)) {
             // set the owning side to null (unless already changed)

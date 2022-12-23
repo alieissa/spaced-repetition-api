@@ -3,7 +3,6 @@
 namespace App\Card;
 
 use App\Deck\DeckEntity;
-use App\Entity\Answer;
 use DateTime;
 use DateTimeImmutable;
 use Psr\Log\LoggerInterface;
@@ -65,6 +64,9 @@ class CardController extends AbstractController
      */
     public function remove(CardEntity $card)
     {
+        /**
+         * TODO is removeCard really necessary?
+         */
         $card->getDeck()->removeCard($card);
         $this->cardRepository->remove($card, true);
         return new Response(Response::HTTP_OK);

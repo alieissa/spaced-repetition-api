@@ -2,7 +2,6 @@
 
 namespace App\Card;
 
-//use CardEntity;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 

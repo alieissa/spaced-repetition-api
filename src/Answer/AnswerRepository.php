@@ -1,27 +1,26 @@
 <?php
 
-namespace App\Repository;
+namespace App\Answer;
 
-use App\Entity\Answer;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Answer>
+ * @extends ServiceEntityRepository<AnswerEntity>
  *
- * @method Answer|null find($id, $lockMode = null, $lockVersion = null)
- * @method Answer|null findOneBy(array $criteria, array $orderBy = null)
- * @method Answer[]    findAll()
- * @method Answer[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method AnswerEntity|null find($id, $lockMode = null, $lockVersion = null)
+ * @method AnswerEntity|null findOneBy(array $criteria, array $orderBy = null)
+ * @method AnswerEntity[]    findAll()
+ * @method AnswerEntity[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class AnswerRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Answer::class);
+        parent::__construct($registry, AnswerEntity::class);
     }
 
-    public function add(Answer $entity, bool $flush = false): void
+    public function add(AnswerEntity $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -30,7 +29,7 @@ class AnswerRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(Answer $entity, bool $flush = false): void
+    public function remove(AnswerEntity $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 
@@ -40,7 +39,7 @@ class AnswerRepository extends ServiceEntityRepository
     }
 
 //    /**
-//     * @return Answer[] Returns an array of Answer objects
+//     * @return AnswerEntity[] Returns an array of AnswerEntity objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -54,7 +53,7 @@ class AnswerRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?Answer
+//    public function findOneBySomeField($value): ?AnswerEntity
 //    {
 //        return $this->createQueryBuilder('a')
 //            ->andWhere('a.exampleField = :val')

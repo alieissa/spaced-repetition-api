@@ -2,9 +2,9 @@
 
 namespace App\DataFixtures;
 
+use App\Answer\AnswerFactory;
 use App\Card\CardFactory;
 use App\Deck\DeckFactory;
-use App\Factory\AnswerFactory;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 

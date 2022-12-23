@@ -2,8 +2,6 @@
 
 namespace App\Card;
 
-//use App\Card\CardEntity;
-//use App\Card\CardRepository;
 use Zenstruck\Foundry\ModelFactory;
 use Zenstruck\Foundry\Proxy;
 use Zenstruck\Foundry\RepositoryProxy;
