@@ -18,6 +18,8 @@ services:
         exclude:
             - '../src/DependencyInjection/'
             - '../src/Kernel.php'
-
+    web_service_user_provider:
+        class: App\Security\WebServiceUserProvider
+        arguments: ["@jwt_auth_auth0_service"]
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
