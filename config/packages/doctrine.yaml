@@ -10,6 +10,11 @@ doctrine:
     naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
     auto_mapping: true
     mappings:
+      UserEntity:
+        type: annotation
+        is_bundle: false
+        prefix: App\Security\User
+        dir: '%kernel.project_dir%/src/Security/User/'
       AnswerEntity:
         type: annotation
         is_bundle: false
