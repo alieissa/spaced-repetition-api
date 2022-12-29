@@ -6,6 +6,14 @@ on:
   pull_request:
 
 jobs:
+  login:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
   symfony:
     name: Symfony 5.4 (PHP ${{ matrix.php-versions }})
     # https://hub.docker.com/_/ubuntu/
@@ -15,11 +23,11 @@ jobs:
       matrix:
         php-versions: [ '7.4' ]
     steps:
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      #      - name: Login to Docker Hub
+      #        uses: docker/login-action@v2
+      #        with:
+      #          username: ${{ secrets.DOCKERHUB_USERNAME }}
+      #          password: ${{ secrets.DOCKERHUB_TOKEN }}
       # https://github.com/actions/checkout (official)
       - name: Checkout
         uses: actions/checkout@v2
