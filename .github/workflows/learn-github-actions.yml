@@ -6,20 +6,20 @@ on:
   pull_request:
 
 jobs:
-  login:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+  #  login:
+  #    runs-on: ubuntu-latest
+  #    steps:
+  #      - name: Login to Docker Hub
+  #        uses: docker/login-action@v2
+  #        with:
+  #          username: ${{ secrets.DOCKERHUB_USERNAME }}
+  #          password: ${{ secrets.DOCKERHUB_TOKEN }}
   symfony:
     name: Symfony 5.4 (PHP ${{ matrix.php-versions }})
     # https://hub.docker.com/_/ubuntu/
     runs-on: ubuntu-latest
     strategy:
-      #      fail-fast: true
+      fail-fast: true
       matrix:
         php-versions: [ '7.4' ]
     steps:
@@ -34,9 +34,8 @@ jobs:
 
       # https://github.com/shivammathur/setup-php (community)
       - name: Setup PHP, extensions and composer with shivammathur/setup-php
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@verbose
         with:
-          php-version: '7.4'
           tools: symfony-cli
 
       # Composer
