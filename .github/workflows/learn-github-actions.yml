@@ -4,6 +4,8 @@ on:
     branches:
       - experiment-github-actions
   pull_request:
+    branches:
+      - main
 
 jobs:
   symfony:
@@ -14,27 +16,28 @@ jobs:
       fail-fast: true
       matrix:
         php-versions: [ '7.4' ]
+            
     steps:
-      - name: echo environment
-        run: echo $GITHUB_SHA
+      # https://github.com/actions/checkout (official)
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      # https://github.com/docker/login-action
       - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # https://github.com/actions/checkout (official)
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Build and push
+      # https://github.com/docker/build-push-action
+      - name: Build and push to Docker Hub
         uses: docker/build-push-action@v3
         with:
           context: .
           push: true
-          tags: aeissa/spaced-repetition:GITHUB_SHA
-          #            aeissa/spaced-repetition:${{ github.sha }}
-        #                  aeissa/spaced-repetition:latest
+          tags: |
+            aeissa/spaced-repetition:${{ github.sha }}
+            aeissa/spaced-repetition:latest
 
         #      # https://github.com/shivammathur/setup-php (community)
         #      - name: Setup PHP, extensions and composer with shivammathur/setup-php
