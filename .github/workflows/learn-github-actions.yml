@@ -35,13 +35,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-        #      - name: Build and push
-        #        uses: docker/build-push-action@v3
-        #        with:
-        #          context: .
-        #          push: true
-        #          tags: 'aeissa/spaced-repetition:$env.GITHUB_SHA'
-        #        #            aeissa/spaced-repetition:$env.GITHUB_SHA
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          push: true
+          tags: aeissa/spaced-repetition:$GITHUB_SHA
+        #            aeissa/spaced-repetition:$env.GITHUB_SHA
 
         #      # https://github.com/shivammathur/setup-php (community)
         #      - name: Setup PHP, extensions and composer with shivammathur/setup-php
