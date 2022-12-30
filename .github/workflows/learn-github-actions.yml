@@ -40,7 +40,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: aeissa/spaced-repetition:"$GITHUB_SHA"
+          tags: aeissa/spaced-repetition:${{ github.sha }}
         #            aeissa/spaced-repetition:$env.GITHUB_SHA
 
         #      # https://github.com/shivammathur/setup-php (community)
