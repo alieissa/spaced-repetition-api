@@ -38,9 +38,8 @@ jobs:
         with:
           context: .
           push: true
-          tags: |
-            aeissa/spaced-repetition:latest
-            aeissa/spaced-repetition:$env.GITHUB_SHA
+          tags: aeissa/spaced-repetition:latest
+        #            aeissa/spaced-repetition:$env.GITHUB_SHA
 
         #      # https://github.com/shivammathur/setup-php (community)
         #      - name: Setup PHP, extensions and composer with shivammathur/setup-php
