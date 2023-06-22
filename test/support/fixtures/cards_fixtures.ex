@@ -15,7 +15,7 @@ defmodule SpacedRep.CardsFixtures do
         quality: 42,
         easiness: 42,
         question: "some question",
-        next_practice_date: ~N[2023-06-16 21:19:00]
+        next_practice_date: ~U[2023-06-16 21:19:00Z]
       })
       |> SpacedRep.Cards.create_card()
 

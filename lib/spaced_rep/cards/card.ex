@@ -4,18 +4,18 @@ defmodule SpacedRep.Cards.Card do
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
-
+  @timestamps_opts [type: :utc_datetime]
   schema "cards" do
-    field :interval, :integer, default: 1
-    field :quality, :integer, default: 3
-    field :easiness, :float, default: 2.5
-    field :repetitions, :integer, default: 0
-    field :question, :string
+    field(:interval, :integer, default: 1)
+    field(:quality, :integer, default: 3)
+    field(:easiness, :float, default: 2.5)
+    field(:repetitions, :integer, default: 0)
+    field(:question, :string)
 
-    field :next_practice_date, :naive_datetime
+    field(:next_practice_date, :utc_datetime)
 
-    has_many :answer, SpacedRep.Answers.Answer
-    belongs_to :deck, SpacedRep.Decks.Deck
+    has_many(:answer, SpacedRep.Answers.Answer)
+    belongs_to(:deck, SpacedRep.Decks.Deck)
 
     timestamps()
   end

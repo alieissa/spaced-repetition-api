@@ -23,6 +23,7 @@ config :spaced_rep, SpacedRepWeb.Endpoint,
   check_origin: false,
   code_reloader: true,
   debug_errors: true,
+  # Not used for anything. Not sensitive
   secret_key_base: "kTBHlo1+SiZNyb2zb7YBtrjyYO4t3K4v4FD5emRy2J7DXKYMseJpL2UBZ2n56zC3",
   watchers: []
 
