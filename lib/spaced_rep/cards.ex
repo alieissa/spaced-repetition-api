@@ -75,8 +75,8 @@ defmodule SpacedRep.Cards do
       end
 
     next_practice_date =
-      NaiveDateTime.utc_now()
-      |> NaiveDateTime.add(updated_interval, :day)
+      DateTime.utc_now()
+      |> DateTime.add(updated_interval, :day)
 
     Map.merge(
       attrs,

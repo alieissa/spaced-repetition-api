@@ -4,6 +4,7 @@ defmodule SpacedRep.Decks.Deck do
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
+  @timestamps_opts [type: :utc_datetime]
   schema "decks" do
     field :name, :string
     field :description, :string

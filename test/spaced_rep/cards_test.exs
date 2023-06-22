@@ -105,11 +105,9 @@ defmodule SpacedRep.CardsTest do
       assert card.interval == 24
     end
 
-    @docp """
-      When quality is less than 3 the interval and repetitions are reset
-      to 1 and 0 respectively. Since interval is what determines the next
-      practice date, it is not necessary to update any of the other values
-    """
+    # When quality is less than 3 the interval and repetitions are reset
+    # to 1 and 0 respectively. Since interval is what determines the next
+    # practice date, it is not necessary to update any of the other values
     test "update_card/2 when new quality is less than 3" do
       card = insert(:card, %{interval: 6, repetitions: 5})
 

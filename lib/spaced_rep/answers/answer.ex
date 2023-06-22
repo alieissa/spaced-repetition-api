@@ -4,6 +4,7 @@ defmodule SpacedRep.Answers.Answer do
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
+  @timestamps_opts [type: :utc_datetime]
   schema "answers" do
     field :content, :string
     belongs_to :card, SpacedRep.Cards.Card

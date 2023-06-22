@@ -15,8 +15,6 @@ defmodule SpacedRepWeb.DeckController do
 
   def create(conn, deck_params) do
     with {:ok, %Deck{} = deck} <- Decks.create_deck(deck_params) do
-      Logger.info("Update create deck")
-
       conn
       |> put_status(:created)
       |> put_resp_header("location", ~p"/api/decks/#{deck}")
@@ -46,13 +44,3 @@ defmodule SpacedRepWeb.DeckController do
     end
   end
 end
-
-# put  "/api/foo/:id"  FooWeb.FooController :update
-
-# def update(conn, %{"id" => id, "name" => name, "description" => description}) do
-#  ...
-# end
-
-# def update(conn, %{"id" => id},  params) do
-#  ...
-# end

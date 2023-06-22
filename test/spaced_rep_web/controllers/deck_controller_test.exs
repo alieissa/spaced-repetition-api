@@ -48,15 +48,14 @@ defmodule SpacedRepWeb.DeckControllerTest do
   describe "update deck" do
     setup [:create_deck]
 
-    test "renders deck when data is valid", %{conn: conn, deck: %Deck{id: id} = deck} do
-      conn = put(conn, ~p"/api/decks/#{deck}", @update_attrs)
+    test "renders deck when data is valid", %{conn: conn, deck: %Deck{id: id}} do
+      conn = put(conn, ~p"/api/decks/#{id}", @update_attrs)
       assert %{"id" => ^id} = json_response(conn, 200)["data"]
 
       conn = get(conn, ~p"/api/decks/#{id}")
 
       assert %{
                "id" => ^id,
-               #  "description" => "some updated description",
                "name" => "some updated name"
              } = json_response(conn, 200)["data"]
     end
