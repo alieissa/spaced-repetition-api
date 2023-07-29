@@ -26,3 +26,6 @@ erl_crash.dump
 spaced_rep-*.tar
 
 .DS_Store
+
+/rel/
+release.ex
