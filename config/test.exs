@@ -8,7 +8,7 @@ import Config
 config :spaced_rep, SpacedRep.Repo,
   username: System.get_env("POSTGRES_USERNAME", "postgres"),
   password: System.get_env("POSTGRES_PASSWORD", "postgres"),
-  hostname: System.get_env("POSTGRES_HOST", "localhost"),
+  hostname: System.get_env("POSTGRES_HOSTNAME", "localhost"),
   database: System.get_env("POSTGRES_DB", "spaced_rep_test"),
   pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: 10
@@ -16,8 +16,8 @@ config :spaced_rep, SpacedRep.Repo,
 # We don't run a server during test. If one is required,
 # you can enable the server option below.
 config :spaced_rep, SpacedRepWeb.Endpoint,
-  http: [ip: {127, 0, 0, 1}, port: 4002],
-  secret_key_base: "Luk2gRGLW1eznCKBl2WOtjHS64/eCNXaBn+TU6FPnH/DFyWWXKbJzeV71KfTwlec",
+  http: [ip: {0, 0, 0, 0}, port: 4002],
+  secret_key_base: "Luk2gRGLW1eznCKBl2WOtjHS64/eCNXaBn+TU6FPnH/DFyWWXKbJzeV71KfTwlecs",
   server: false
 
 # Print only warnings and errors during test

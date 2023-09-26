@@ -1,16 +1,21 @@
-version: "3.9"  # optional since v1.27.0
+# @format
+
+version: '3.9' # optional since v1.27.0
 services:
   server:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
     volumes:
       - .:/app
-    working_dir: /app
-    ports: 
-      - "4000:4000"
-    entrypoint: "./init.sh"
+    ports:
+      - 5000:5000
+    environment:
+      POSTGRES_PASSWORD: postgres
+    entrypoint: './init.sh'
   db:
     image: postgres:14.7
     ports:
-      - "5432:5432"
+      - '5432:5432'
     environment:
-      POSTGRES_PASSWORD: spaced-repetition
+      POSTGRES_PASSWORD: postgres
