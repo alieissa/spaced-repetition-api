@@ -2,10 +2,10 @@ import Config
 
 # Configure your database
 config :spaced_rep, SpacedRep.Repo,
-  username: "postgres",
-  password: "spaced-repetition",
-  hostname: "db",
-  database: "spaced_rep_dev",
+  username: System.get_env("POSTGRES_USERNAME", "postgres"),
+  password: System.get_env("POSTGRES_PASSWORD","spaced-repetition"),
+  hostname: System.get_env("POSTGRES_HOST", "db"),
+  database: System.get_env("POSTGRES_DB", "spaced_rep_dev"),
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
