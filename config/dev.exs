@@ -3,7 +3,7 @@ import Config
 # Configure your database
 config :spaced_rep, SpacedRep.Repo,
   username: System.get_env("POSTGRES_USERNAME", "postgres"),
-  password: System.get_env("POSTGRES_PASSWORD","spaced-repetition"),
+  password: System.get_env("POSTGRES_PASSWORD", "spaced-repetition"),
   hostname: System.get_env("POSTGRES_HOST", "db"),
   database: System.get_env("POSTGRES_DB", "spaced_rep_dev"),
   stacktrace: true,
@@ -19,7 +19,7 @@ config :spaced_rep, SpacedRep.Repo,
 config :spaced_rep, SpacedRepWeb.Endpoint,
   # Binding to loopback ipv4 address prevents access from other machines.
   # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
-  http: [ip: {0, 0, 0, 0}, port: 4000],
+  http: [ip: {0, 0, 0, 0}, port: System.get_env("PORT", "5000")],
   check_origin: false,
   code_reloader: true,
   debug_errors: true,
