@@ -20,27 +20,27 @@ defmodule SpacedRepWeb.DeckControllerTest do
 
   describe "index" do
     test "lists all decks", %{conn: conn} do
-      conn = get(conn, ~p"/api/decks")
-      assert json_response(conn, 200)["data"] == []
+      conn = get(conn, ~p"/decks")
+      assert json_response(conn, 200) == []
     end
   end
 
   describe "create deck" do
     test "renders deck when data is valid", %{conn: conn} do
-      conn = post(conn, ~p"/api/decks", @create_attrs)
-      assert %{"id" => id} = json_response(conn, 201)["data"]
+      conn = post(conn, ~p"/decks", @create_attrs)
+      assert %{"id" => id} = json_response(conn, 201)
 
-      conn = get(conn, ~p"/api/decks/#{id}")
+      conn = get(conn, ~p"/decks/#{id}")
 
       assert %{
                "id" => ^id,
                "description" => "some description",
                "name" => "some name"
-             } = json_response(conn, 200)["data"]
+             } = json_response(conn, 200)
     end
 
     test "renders errors when data is invalid", %{conn: conn} do
-      conn = post(conn, ~p"/api/decks", @invalid_attrs)
+      conn = post(conn, ~p"/decks", @invalid_attrs)
       assert json_response(conn, 422)["errors"] != %{}
     end
   end
@@ -49,19 +49,19 @@ defmodule SpacedRepWeb.DeckControllerTest do
     setup [:create_deck]
 
     test "renders deck when data is valid", %{conn: conn, deck: %Deck{id: id}} do
-      conn = put(conn, ~p"/api/decks/#{id}", @update_attrs)
-      assert %{"id" => ^id} = json_response(conn, 200)["data"]
+      conn = put(conn, ~p"/decks/#{id}", @update_attrs)
+      assert %{"id" => ^id} = json_response(conn, 200)
 
-      conn = get(conn, ~p"/api/decks/#{id}")
+      conn = get(conn, ~p"/decks/#{id}")
 
       assert %{
                "id" => ^id,
                "name" => "some updated name"
-             } = json_response(conn, 200)["data"]
+             } = json_response(conn, 200)
     end
 
     test "renders errors when data is invalid", %{conn: conn, deck: deck} do
-      conn = put(conn, ~p"/api/decks/#{deck}", @invalid_attrs)
+      conn = put(conn, ~p"/decks/#{deck}", @invalid_attrs)
       assert json_response(conn, 422)["errors"] != %{}
     end
   end
@@ -70,11 +70,11 @@ defmodule SpacedRepWeb.DeckControllerTest do
     setup [:create_deck]
 
     test "deletes chosen deck", %{conn: conn, deck: deck} do
-      conn = delete(conn, ~p"/api/decks/#{deck}")
+      conn = delete(conn, ~p"/decks/#{deck}")
       assert response(conn, 204)
 
       assert_error_sent 404, fn ->
-        get(conn, ~p"/api/decks/#{deck}")
+        get(conn, ~p"/decks/#{deck}")
       end
     end
   end

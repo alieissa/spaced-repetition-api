@@ -17,7 +17,7 @@ defmodule SpacedRepWeb.DeckController do
     with {:ok, %Deck{} = deck} <- Decks.create_deck(deck_params) do
       conn
       |> put_status(:created)
-      |> put_resp_header("location", ~p"/api/decks/#{deck}")
+      |> put_resp_header("location", ~p"/decks/#{deck}")
       |> render(:show, deck: deck)
     end
   end

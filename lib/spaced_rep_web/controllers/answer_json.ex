@@ -5,14 +5,14 @@ defmodule SpacedRepWeb.AnswerJSON do
   Renders a list of answers.
   """
   def index(%{answers: answers}) do
-    %{data: for(answer <- answers, do: data(answer))}
+    for(answer <- answers, do: data(answer))
   end
 
   @doc """
   Renders a single answer.
   """
   def show(%{answer: answer}) do
-    %{data: data(answer)}
+    data(answer)
   end
 
   defp data(%Answer{} = answer) do

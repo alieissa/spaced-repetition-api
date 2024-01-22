@@ -20,9 +20,9 @@ defmodule SpacedRepWeb.AnswerControllerTest do
     setup [:create_answer]
 
     test "lists all answers", %{conn: conn, answer: %Answer{id: id, content: content, card: card}} do
-      conn = get(conn, ~p"/api/decks/#{card.deck_id}/cards/#{card.id}/answers")
+      conn = get(conn, ~p"/decks/#{card.deck_id}/cards/#{card.id}/answers")
 
-      assert json_response(conn, 200)["data"] == [
+      assert json_response(conn, 200) == [
                %{"id" => id, "content" => content}
              ]
     end
@@ -32,20 +32,20 @@ defmodule SpacedRepWeb.AnswerControllerTest do
     setup [:create_answer]
 
     test "renders answer when data is valid", %{conn: conn, answer: %Answer{card: card}} do
-      conn = post(conn, ~p"/api/decks/#{card.deck_id}/cards/#{card.id}/answers", @create_attrs)
+      conn = post(conn, ~p"/decks/#{card.deck_id}/cards/#{card.id}/answers", @create_attrs)
 
-      assert %{"id" => id} = json_response(conn, 201)["data"]
+      assert %{"id" => id} = json_response(conn, 201)
 
-      conn = get(conn, ~p"/api/decks/#{card.deck_id}/cards/#{card.id}/answers/#{id}")
+      conn = get(conn, ~p"/decks/#{card.deck_id}/cards/#{card.id}/answers/#{id}")
 
       assert %{
                "id" => ^id,
                "content" => "some content"
-             } = json_response(conn, 200)["data"]
+             } = json_response(conn, 200)
     end
 
     test "renders errors when data is invalid", %{conn: conn, answer: %Answer{card: card}} do
-      conn = post(conn, ~p"/api/decks/#{card.deck_id}/cards/#{card.id}/answers", @invalid_attrs)
+      conn = post(conn, ~p"/decks/#{card.deck_id}/cards/#{card.id}/answers", @invalid_attrs)
 
       assert json_response(conn, 422)["errors"] != %{}
     end
@@ -55,22 +55,20 @@ defmodule SpacedRepWeb.AnswerControllerTest do
     setup [:create_answer]
 
     test "renders answer when data is valid", %{conn: conn, answer: %Answer{id: id, card: card}} do
-      conn =
-        put(conn, ~p"/api/decks/#{card.deck_id}/cards/#{card.id}/answers/#{id}", @update_attrs)
+      conn = put(conn, ~p"/decks/#{card.deck_id}/cards/#{card.id}/answers/#{id}", @update_attrs)
 
-      assert %{"id" => ^id} = json_response(conn, 200)["data"]
+      assert %{"id" => ^id} = json_response(conn, 200)
 
-      conn = get(conn, ~p"/api/decks/#{card.deck_id}/cards/#{card.id}/answers/#{id}")
+      conn = get(conn, ~p"/decks/#{card.deck_id}/cards/#{card.id}/answers/#{id}")
 
       assert %{
                "id" => ^id,
                "content" => "some updated content"
-             } = json_response(conn, 200)["data"]
+             } = json_response(conn, 200)
     end
 
     test "renders errors when data is invalid", %{conn: conn, answer: %Answer{id: id, card: card}} do
-      conn =
-        put(conn, ~p"/api/decks/#{card.deck_id}/cards/#{card.id}/answers/#{id}", @invalid_attrs)
+      conn = put(conn, ~p"/decks/#{card.deck_id}/cards/#{card.id}/answers/#{id}", @invalid_attrs)
 
       assert json_response(conn, 422)["errors"] != %{}
     end
@@ -80,11 +78,11 @@ defmodule SpacedRepWeb.AnswerControllerTest do
     setup [:create_answer]
 
     test "deletes chosen answer", %{conn: conn, answer: %Answer{id: id, card: card}} do
-      conn = delete(conn, ~p"/api/decks/#{card.deck_id}/cards/#{card.id}/answers/#{id}")
+      conn = delete(conn, ~p"/decks/#{card.deck_id}/cards/#{card.id}/answers/#{id}")
       assert response(conn, 204)
 
       assert_error_sent 404, fn ->
-        get(conn, ~p"/api/decks/#{card.deck_id}/cards/#{card.id}/answers/#{id}")
+        get(conn, ~p"/decks/#{card.deck_id}/cards/#{card.id}/answers/#{id}")
       end
     end
   end
