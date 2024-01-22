@@ -20,7 +20,7 @@ defmodule SpacedRepWeb.CardController do
     with {:ok, %Card{} = card} <- Cards.create_card(card_params) do
       conn
       |> put_status(:created)
-      |> put_resp_header("location", ~p"/api/decks/#{deck_id}/cards/#{card}")
+      |> put_resp_header("location", ~p"/decks/#{deck_id}/cards/#{card}")
       |> render(:show, card: card)
     end
   end

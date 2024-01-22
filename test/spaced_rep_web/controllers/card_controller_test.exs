@@ -34,9 +34,9 @@ defmodule SpacedRepWeb.CardControllerTest do
     setup [:create_card]
 
     test "lists all cards", %{conn: conn, card: %Card{deck_id: deck_id} = card} do
-      conn = get(conn, ~p"/api/decks/#{deck_id}/cards")
+      conn = get(conn, ~p"/decks/#{deck_id}/cards")
 
-      assert json_response(conn, 200)["data"] == [
+      assert json_response(conn, 200) == [
                %{
                  "id" => card.id,
                  "deck_id" => card.deck_id,
@@ -59,11 +59,11 @@ defmodule SpacedRepWeb.CardControllerTest do
       card: %Card{deck_id: deck_id}
     } do
       conn =
-        post(conn, ~p"/api/decks/#{deck_id}/cards", Map.merge(@create_attrs, %{deck_id: deck_id}))
+        post(conn, ~p"/decks/#{deck_id}/cards", Map.merge(@create_attrs, %{deck_id: deck_id}))
 
-      assert(%{"id" => id} = json_response(conn, 201)["data"])
+      assert(%{"id" => id} = json_response(conn, 201))
 
-      conn = get(conn, ~p"/api/decks/#{deck_id}/cards/#{id}")
+      conn = get(conn, ~p"/decks/#{deck_id}/cards/#{id}")
 
       %{easiness: easiness, interval: interval, question: question, quality: quality} =
         @create_attrs
@@ -75,11 +75,11 @@ defmodule SpacedRepWeb.CardControllerTest do
                "next_practice_date" => "2023-06-16T21:19:00Z",
                "quality" => ^quality,
                "question" => ^question
-             } = json_response(conn, 200)["data"]
+             } = json_response(conn, 200)
     end
 
     test "renders errors when data is invalid", %{conn: conn, card: %Card{deck_id: deck_id}} do
-      conn = post(conn, ~p"/api/decks/#{deck_id}/cards", @invalid_attrs)
+      conn = post(conn, ~p"/decks/#{deck_id}/cards", @invalid_attrs)
       assert json_response(conn, 422)["errors"] != %{}
     end
   end
@@ -91,10 +91,10 @@ defmodule SpacedRepWeb.CardControllerTest do
       conn: conn,
       card: %Card{id: id, deck_id: deck_id} = card
     } do
-      conn = put(conn, ~p"/api/decks/#{deck_id}/cards/#{id}", @update_attrs)
-      assert %{"id" => ^id} = json_response(conn, 200)["data"]
+      conn = put(conn, ~p"/decks/#{deck_id}/cards/#{id}", @update_attrs)
+      assert %{"id" => ^id} = json_response(conn, 200)
 
-      conn = get(conn, ~p"/api/decks/#{deck_id}/cards/#{card.id}")
+      conn = get(conn, ~p"/decks/#{deck_id}/cards/#{card.id}")
 
       assert %{
                "id" => ^id,
@@ -103,7 +103,7 @@ defmodule SpacedRepWeb.CardControllerTest do
                "next_practice_date" => "2023-06-17T21:19:00Z",
                "quality" => 1,
                "question" => "some updated question"
-             } = json_response(conn, 200)["data"]
+             } = json_response(conn, 200)
     end
 
     # TODO Fix this test
@@ -112,7 +112,7 @@ defmodule SpacedRepWeb.CardControllerTest do
       conn: conn,
       card: %Card{id: id, deck_id: deck_id}
     } do
-      conn = put(conn, ~p"/api/decks/#{deck_id}/cards/#{id}", @invalid_attrs)
+      conn = put(conn, ~p"/decks/#{deck_id}/cards/#{id}", @invalid_attrs)
       assert json_response(conn, 422)["errors"] != %{}
     end
   end
@@ -121,11 +121,11 @@ defmodule SpacedRepWeb.CardControllerTest do
     setup [:create_card]
 
     test "deletes chosen card", %{conn: conn, card: %Card{id: id, deck_id: deck_id}} do
-      conn = delete(conn, ~p"/api/decks/#{deck_id}/cards/#{id}")
+      conn = delete(conn, ~p"/decks/#{deck_id}/cards/#{id}")
       assert response(conn, 204)
 
       assert_error_sent(404, fn ->
-        get(conn, ~p"/api/decks/#{deck_id}/cards/#{id}")
+        get(conn, ~p"/decks/#{deck_id}/cards/#{id}")
       end)
     end
   end

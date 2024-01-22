@@ -20,7 +20,7 @@ defmodule SpacedRepWeb.AnswerController do
     with {:ok, %Answer{} = answer} <- Answers.create_answer(answer_params) do
       conn
       |> put_status(:created)
-      |> put_resp_header("location", ~p"/api/decks/#{deck_id}/cards/#{card_id}/answers/#{answer}")
+      |> put_resp_header("location", ~p"/decks/#{deck_id}/cards/#{card_id}/answers/#{answer}")
       |> render(:show, answer: answer)
     end
   end

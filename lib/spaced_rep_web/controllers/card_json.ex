@@ -5,14 +5,14 @@ defmodule SpacedRepWeb.CardJSON do
   Renders a list of cards.
   """
   def index(%{cards: cards}) do
-    %{data: for(card <- cards, do: data(card))}
+    for(card <- cards, do: data(card))
   end
 
   @doc """
   Renders a single card.
   """
   def show(%{card: card}) do
-    %{data: data(card)}
+    data(card)
   end
 
   defp data(%Card{} = card) do

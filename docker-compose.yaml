@@ -9,9 +9,10 @@ services:
     volumes:
       - .:/app
     ports:
-      - 5000:5000
+      - 8000:8000
     environment:
       POSTGRES_PASSWORD: postgres
+      PORT: 8000
     entrypoint: './init.sh'
   db:
     image: postgres:14.7
