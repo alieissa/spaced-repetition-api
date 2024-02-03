@@ -23,10 +23,29 @@ defmodule SpacedRep.Cards.Card do
   end
 
   @doc false
+  def changeset(card, deck_id, attrs) do
+    card
+    |> change(%{deck_id: deck_id})
+    |> cast(attrs, [
+      :deck_id,
+      :quality,
+      :easiness,
+      :interval,
+      :question,
+      :repetitions,
+      :next_practice_date
+    ])
+    |> validate_required([:interval, :question])
+    |> validate_number(:easiness, greater_than_or_equal_to: 1.3)
+    |> validate_number(:quality, greater_than: 0, less_than_or_equal_to: 5)
+    |> unique_constraint(:question)
+    |> cast_assoc(:answers)
+  end
+
+  @doc false
   def changeset(card, attrs) do
     card
     |> cast(attrs, [
-      :deck_id,
       :quality,
       :easiness,
       :interval,

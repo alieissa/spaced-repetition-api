@@ -18,12 +18,13 @@ defmodule SpacedRepWeb.CardJSON do
   defp data(%Card{} = card) do
     %{
       id: card.id,
+      question: card.question,
+      answers: card.answers,
       deck_id: card.deck_id,
       quality: card.quality,
       easiness: card.easiness,
       interval: card.interval,
       repetitions: card.repetitions,
-      question: card.question,
       next_practice_date: card.next_practice_date
     }
   end
