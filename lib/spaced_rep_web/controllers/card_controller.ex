@@ -17,7 +17,7 @@ defmodule SpacedRepWeb.CardController do
   end
 
   def create(conn, %{"deck_id" => deck_id}, card_params) do
-    with {:ok, %Card{} = card} <- Cards.create_card(card_params) do
+    with {:ok, %Card{} = card} <- Cards.create_card(deck_id, card_params) do
       conn
       |> put_status(:created)
       |> put_resp_header("location", ~p"/decks/#{deck_id}/cards/#{card}")

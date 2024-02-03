@@ -19,7 +19,7 @@ defmodule SpacedRep.Cards do
   """
   def list_cards(deck_id) do
     query = from(c in Card, where: c.deck_id == ^deck_id)
-    Repo.all(query)
+    Repo.all(query) |> Repo.preload(:answers)
   end
 
   @doc """
@@ -36,7 +36,7 @@ defmodule SpacedRep.Cards do
       ** (Ecto.NoResultsError)
 
   """
-  def get_card!(id), do: Repo.get!(Card, id)
+  def get_card!(id), do: Repo.get!(Card, id) |> Repo.preload(:answers)
 
   @doc """
   Creates a card.
@@ -50,9 +50,9 @@ defmodule SpacedRep.Cards do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_card(attrs \\ %{}) do
+  def create_card(deck_id, attrs \\ %{}) do
     %Card{}
-    |> Card.changeset(attrs)
+    |> Card.changeset(deck_id, attrs)
     |> Repo.insert()
   end
 
