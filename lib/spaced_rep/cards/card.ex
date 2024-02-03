@@ -2,6 +2,8 @@ defmodule SpacedRep.Cards.Card do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @derive {Jason.Encoder, only: [:id, :question, :answers]}
+
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   @timestamps_opts [type: :utc_datetime]
@@ -14,8 +16,8 @@ defmodule SpacedRep.Cards.Card do
 
     field(:next_practice_date, :utc_datetime)
 
-    has_many(:answer, SpacedRep.Answers.Answer)
-    belongs_to(:deck, SpacedRep.Decks.Deck)
+    has_many :answers, SpacedRep.Answers.Answer
+    belongs_to :deck, SpacedRep.Decks.Deck
 
     timestamps()
   end
@@ -36,5 +38,6 @@ defmodule SpacedRep.Cards.Card do
     |> validate_number(:easiness, greater_than_or_equal_to: 1.3)
     |> validate_number(:quality, greater_than: 0, less_than_or_equal_to: 5)
     |> unique_constraint(:question)
+    |> cast_assoc(:answers)
   end
 end

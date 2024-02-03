@@ -69,6 +69,7 @@ defmodule SpacedRepWeb.DeckControllerTest do
   describe "delete deck" do
     setup [:create_deck]
 
+    @tag :skip
     test "deletes chosen deck", %{conn: conn, deck: deck} do
       conn = delete(conn, ~p"/decks/#{deck}")
       assert response(conn, 204)

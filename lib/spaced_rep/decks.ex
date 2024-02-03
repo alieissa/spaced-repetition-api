@@ -35,7 +35,9 @@ defmodule SpacedRep.Decks do
       ** (Ecto.NoResultsError)
 
   """
-  def get_deck!(id), do: Repo.get!(Deck, id)
+  def get_deck!(id) do
+    Repo.get(Deck, id) |> Repo.preload(cards: [:answers])
+  end
 
   @doc """
   Creates a deck.
@@ -53,6 +55,10 @@ defmodule SpacedRep.Decks do
     %Deck{}
     |> Deck.changeset(attrs)
     |> Repo.insert()
+    |> case do
+      {:ok, deck} -> {:ok, Repo.preload(deck, cards: [:answers])}
+      error -> error
+    end
   end
 
   @doc """
@@ -70,7 +76,12 @@ defmodule SpacedRep.Decks do
   def update_deck(%Deck{} = deck, attrs) do
     deck
     |> Deck.changeset(attrs)
+    ## TODO Upsert nested cards and answers
     |> Repo.update()
+    |> case do
+      {:ok, deck} -> {:ok, Repo.preload(deck, cards: [:answers])}
+      error -> error
+    end
   end
 
   @doc """

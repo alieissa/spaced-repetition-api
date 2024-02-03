@@ -8,7 +8,7 @@ defmodule SpacedRep.Decks.Deck do
   schema "decks" do
     field :name, :string
     field :description, :string
-    has_many :card, SpacedRep.Cards.Card
+    has_many :cards, SpacedRep.Cards.Card
 
     timestamps()
   end
@@ -18,5 +18,6 @@ defmodule SpacedRep.Decks.Deck do
     deck
     |> cast(attrs, [:description, :name])
     |> validate_required([:description, :name])
+    |> cast_assoc(:cards)
   end
 end
