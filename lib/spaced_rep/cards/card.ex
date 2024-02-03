@@ -42,7 +42,7 @@ defmodule SpacedRep.Cards.Card do
     |> cast_assoc(:answers)
   end
 
-    @doc false
+  @doc false
   def changeset(card, attrs) do
     card
     |> cast(attrs, [

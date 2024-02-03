@@ -9,6 +9,7 @@ defmodule SpacedRepWeb.CardControllerTest do
     quality: 1,
     easiness: 1.3,
     question: "some question",
+    answers: [%{content: "answer1"}],
     next_practice_date: ~U[2023-06-16 21:19:00Z]
   }
   @update_attrs %{
@@ -39,12 +40,13 @@ defmodule SpacedRepWeb.CardControllerTest do
       assert json_response(conn, 200) == [
                %{
                  "id" => card.id,
+                 "question" => card.question,
+                 "answers" => [],
                  "deck_id" => card.deck_id,
                  "easiness" => card.easiness,
                  "interval" => card.interval,
                  "next_practice_date" => card.next_practice_date |> DateTime.to_iso8601(),
                  "quality" => card.quality,
-                 "question" => card.question,
                  "repetitions" => card.repetitions
                }
              ]
@@ -58,8 +60,7 @@ defmodule SpacedRepWeb.CardControllerTest do
       conn: conn,
       card: %Card{deck_id: deck_id}
     } do
-      conn =
-        post(conn, ~p"/decks/#{deck_id}/cards", Map.merge(@create_attrs, %{deck_id: deck_id}))
+      conn = post(conn, ~p"/decks/#{deck_id}/cards", @create_attrs)
 
       assert(%{"id" => id} = json_response(conn, 201))
 
@@ -75,6 +76,7 @@ defmodule SpacedRepWeb.CardControllerTest do
                "next_practice_date" => "2023-06-16T21:19:00Z",
                "quality" => ^quality,
                "question" => ^question
+               #  TODO add answers to assertion
              } = json_response(conn, 200)
     end
 
