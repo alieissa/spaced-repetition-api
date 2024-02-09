@@ -4,6 +4,7 @@ defmodule SpacedRep.DecksTest do
   alias SpacedRep.Decks
   alias SpacedRep.Decks.Deck
 
+  alias Ecto.UUID
   import SpacedRep.Factory
 
   describe "decks" do
@@ -23,8 +24,9 @@ defmodule SpacedRep.DecksTest do
 
     test "create_deck/1 with valid data creates a deck" do
       valid_attrs = %{name: "some name", description: "some description"}
+      user_id = UUID.autogenerate()
 
-      assert {:ok, %Deck{} = deck} = Decks.create_deck(valid_attrs)
+      assert {:ok, %Deck{} = deck} = Decks.create_deck(user_id, valid_attrs)
       assert deck.name == "some name"
       assert deck.description == "some description"
     end

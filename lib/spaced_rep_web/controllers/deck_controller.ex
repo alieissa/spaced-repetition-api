@@ -14,7 +14,7 @@ defmodule SpacedRepWeb.DeckController do
   end
 
   def create(conn, deck_params) do
-    with {:ok, %Deck{} = deck} <- Decks.create_deck(deck_params) do
+    with {:ok, %Deck{} = deck} <- Decks.create_deck(conn.assigns.user_id, deck_params) do
       conn
       |> put_status(:created)
       |> put_resp_header("location", ~p"/decks/#{deck}")

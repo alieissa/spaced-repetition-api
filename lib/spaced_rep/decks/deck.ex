@@ -8,12 +8,21 @@ defmodule SpacedRep.Decks.Deck do
   schema "decks" do
     field :name, :string
     field :description, :string
+    field :user_id, :binary_id
     has_many :cards, SpacedRep.Cards.Card
 
     timestamps()
   end
 
   @doc false
+  def changeset(deck, user_id, attrs) do
+    deck
+    |> change(%{user_id: user_id})
+    |> cast(attrs, [:description, :name, :user_id])
+    |> validate_required([:description, :name])
+    |> cast_assoc(:cards)
+  end
+
   def changeset(deck, attrs) do
     deck
     |> cast(attrs, [:description, :name])

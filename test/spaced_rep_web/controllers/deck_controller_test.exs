@@ -3,7 +3,9 @@ defmodule SpacedRepWeb.DeckControllerTest do
 
   import SpacedRep.Factory
 
+  alias Ecto.UUID
   alias SpacedRep.Decks.Deck
+  alias SpacedRep.TestUtils, as: Utils
 
   @create_attrs %{
     name: "some name",
@@ -15,7 +17,14 @@ defmodule SpacedRepWeb.DeckControllerTest do
   @invalid_attrs %{name: nil, description: "some updated description"}
 
   setup %{conn: conn} do
-    {:ok, conn: put_req_header(conn, "accept", "application/json")}
+    token = Utils.get_token(%{"sub" => UUID.autogenerate()})
+
+    conn =
+      conn
+      |> put_req_header("authorization", "bearer #{token}")
+      |> put_req_header("accept", "application/json")
+
+    {:ok, conn: conn}
   end
 
   describe "index" do
@@ -27,7 +36,13 @@ defmodule SpacedRepWeb.DeckControllerTest do
 
   describe "create deck" do
     test "renders deck when data is valid", %{conn: conn} do
-      conn = post(conn, ~p"/decks", @create_attrs)
+      # Conn.assign(conn, :user_id, UUID.autogenerate())
+
+      conn =
+        conn
+        |> assign(:usr_id, UUID.autogenerate())
+        |> post(~p"/decks", @create_attrs)
+
       assert %{"id" => id} = json_response(conn, 201)
 
       conn = get(conn, ~p"/decks/#{id}")
