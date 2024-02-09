@@ -3,6 +3,8 @@ defmodule SpacedRepWeb.CardControllerTest do
 
   import SpacedRep.Factory
   alias SpacedRep.Cards.Card
+  alias Ecto.UUID
+  alias SpacedRep.TestUtils, as: Utils
 
   @create_attrs %{
     interval: 2,
@@ -28,7 +30,14 @@ defmodule SpacedRepWeb.CardControllerTest do
   }
 
   setup %{conn: conn} do
-    {:ok, conn: put_req_header(conn, "accept", "application/json")}
+    token = Utils.get_token(%{"sub" => UUID.autogenerate()})
+
+    conn =
+      conn
+      |> put_req_header("authorization", "bearer #{token}")
+      |> put_req_header("accept", "application/json")
+
+    {:ok, conn: conn}
   end
 
   describe "index" do

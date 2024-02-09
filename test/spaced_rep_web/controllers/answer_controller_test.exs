@@ -3,6 +3,8 @@ defmodule SpacedRepWeb.AnswerControllerTest do
 
   import SpacedRep.Factory
   alias SpacedRep.Answers.Answer
+  alias Ecto.UUID
+  alias SpacedRep.TestUtils, as: Utils
 
   @create_attrs %{
     content: "some content"
@@ -13,7 +15,14 @@ defmodule SpacedRepWeb.AnswerControllerTest do
   @invalid_attrs %{content: nil}
 
   setup %{conn: conn} do
-    {:ok, conn: put_req_header(conn, "accept", "application/json")}
+    token = Utils.get_token(%{"sub" => UUID.autogenerate()})
+
+    conn =
+      conn
+      |> put_req_header("authorization", "bearer #{token}")
+      |> put_req_header("accept", "application/json")
+
+    {:ok, conn: conn}
   end
 
   describe "index" do

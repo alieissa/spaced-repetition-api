@@ -1,6 +1,8 @@
 defmodule SpacedRepWeb.HealthCheckControllerTest do
   use SpacedRepWeb.ConnCase
 
+  alias SpacedRep.TestUtils, as: Utils
+
   describe "index" do
     test "health", %{conn: conn} do
       conn = get(conn, ~p"/health")
@@ -18,7 +20,7 @@ defmodule SpacedRepWeb.HealthCheckControllerTest do
     end
 
     test "request with token that does not have sub", %{conn: conn} do
-      token = get_token(%{"foo" => "bar"})
+      token = Utils.get_token(%{"foo" => "bar"})
 
       conn =
         conn
@@ -29,7 +31,7 @@ defmodule SpacedRepWeb.HealthCheckControllerTest do
     end
 
     test "request with valid token", %{conn: conn} do
-      token = get_token(%{"sub" => "dummy_user_id"})
+      token = Utils.get_token(%{"sub" => "dummy_user_id"})
 
       conn =
         conn
@@ -38,16 +40,5 @@ defmodule SpacedRepWeb.HealthCheckControllerTest do
 
       assert conn.assigns.user_id == "dummy_user_id"
     end
-  end
-
-  # Straight from JOSE documentation
-  # https://hexdocs.pm/jose/JOSE.JWT.html
-  defp get_token(payload) do
-    jwk_hs256 = JOSE.JWK.generate_key({:oct, 16})
-
-    # HS256
-    JOSE.JWT.sign(jwk_hs256, %{"alg" => "HS256"}, payload)
-    |> JOSE.JWS.compact()
-    |> elem(1)
   end
 end

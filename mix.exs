@@ -42,8 +42,8 @@ defmodule SpacedRep.MixProject do
       {:jason, "~> 1.2"},
       {:jose, "~> 1.11"},
       {:plug_cowboy, "~> 2.5"},
-      {:ex_machina, "~> 2.7"},
-      {:cors_plug, "~> 3.0"}
+      {:cors_plug, "~> 3.0"},
+      {:ex_machina, "~> 2.7", only: [:test]}
     ]
   end
 

@@ -4,6 +4,7 @@ defmodule SpacedRep.CardsTest do
   alias SpacedRep.Cards
   alias SpacedRep.Cards.Card
 
+  alias Ecto.UUID
   import SpacedRep.Factory
 
   describe "cards" do
@@ -21,13 +22,13 @@ defmodule SpacedRep.CardsTest do
       assert Cards.list_cards(card.deck_id) == [card]
     end
 
-     @tag :skip
+    @tag :skip
     test "get_card!/1 returns the card with given id" do
       card = insert(:card) |> reset_fields([:deck])
       assert Cards.get_card!(card.id) == card
     end
 
-     @tag :skip
+    @tag :skip
     test "create_card/1 with minimal data" do
       deck = insert(:deck)
 

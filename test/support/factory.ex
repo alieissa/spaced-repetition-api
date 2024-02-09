@@ -1,10 +1,12 @@
 defmodule SpacedRep.Factory do
   use ExMachina.Ecto, repo: SpacedRep.Repo
 
+  alias Ecto.UUID
   alias SpacedRep.{Decks.Deck, Cards.Card, Answers.Answer}
 
   def deck_factory do
     %Deck{
+      user_id: UUID.autogenerate(),
       name: "dummy deck",
       description: "Dummy test deck"
     }

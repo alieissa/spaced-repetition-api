@@ -51,9 +51,9 @@ defmodule SpacedRep.Decks do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_deck(attrs \\ %{}) do
+  def create_deck(user_id, attrs \\ %{}) do
     %Deck{}
-    |> Deck.changeset(attrs)
+    |> Deck.changeset(user_id, attrs)
     |> Repo.insert()
     |> case do
       {:ok, deck} -> {:ok, Repo.preload(deck, cards: [:answers])}
