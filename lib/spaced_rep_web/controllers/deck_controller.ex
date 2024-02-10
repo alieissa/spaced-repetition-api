@@ -23,12 +23,14 @@ defmodule SpacedRepWeb.DeckController do
   end
 
   def show(conn, %{"id" => id}) do
-    deck = Decks.get_deck!(id)
-    render(conn, :show, deck: deck)
+    case Decks.get_deck(id) do
+      %Deck{} = deck -> render(conn, :show, deck: deck)
+      nil -> send_resp(conn, :not_found, "")
+    end
   end
 
   def update(conn, %{"id" => id} = deck_params) do
-    deck = Decks.get_deck!(id)
+    deck = Decks.get_deck(id)
 
     with {:ok, %Deck{} = deck} <-
            Decks.update_deck(deck, deck_params) do
@@ -37,9 +39,7 @@ defmodule SpacedRepWeb.DeckController do
   end
 
   def delete(conn, %{"id" => id}) do
-    deck = Decks.get_deck!(id)
-
-    with {:ok, %Deck{}} <- Decks.delete_deck(deck) do
+    with {:ok, %Deck{}} <- Decks.delete_deck(id) do
       send_resp(conn, :no_content, "")
     end
   end

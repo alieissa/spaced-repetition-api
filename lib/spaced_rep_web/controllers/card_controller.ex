@@ -26,12 +26,14 @@ defmodule SpacedRepWeb.CardController do
   end
 
   def show(conn, %{"id" => id}, _) do
-    card = Cards.get_card!(id)
-    render(conn, :show, card: card)
+    case Cards.get_card(id) do
+      %Card{} = card -> render(conn, :show, card: card)
+      nil -> send_resp(conn, :not_found, "")
+    end
   end
 
   def update(conn, %{"id" => id}, card_params) do
-    card = Cards.get_card!(id)
+    card = Cards.get_card(id)
 
     with {:ok, %Card{} = card} <- Cards.update_card(card, card_params) do
       render(conn, :show, card: card)
@@ -39,9 +41,7 @@ defmodule SpacedRepWeb.CardController do
   end
 
   def delete(conn, %{"id" => id}, _) do
-    card = Cards.get_card!(id)
-
-    with {:ok, %Card{}} <- Cards.delete_card(card) do
+    with {:ok, %Card{}} <- Cards.delete_card(id) do
       send_resp(conn, :no_content, "")
     end
   end

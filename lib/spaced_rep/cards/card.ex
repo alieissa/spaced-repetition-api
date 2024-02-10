@@ -15,7 +15,7 @@ defmodule SpacedRep.Cards.Card do
     field(:question, :string)
 
     field(:next_practice_date, :utc_datetime)
-
+    field :deleted_at, :utc_datetime
     has_many :answers, SpacedRep.Answers.Answer
     belongs_to :deck, SpacedRep.Decks.Deck
 
@@ -40,6 +40,12 @@ defmodule SpacedRep.Cards.Card do
     |> validate_number(:quality, greater_than: 0, less_than_or_equal_to: 5)
     |> unique_constraint(:question)
     |> cast_assoc(:answers)
+  end
+
+  def changeset(card, %{deleted_at: _deleted_at} = attrs) do
+    card
+    |> change(attrs)
+    |> cast(attrs, [:deleted_at])
   end
 
   @doc false

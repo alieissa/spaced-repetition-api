@@ -36,7 +36,11 @@ defmodule SpacedRep.Cards do
       ** (Ecto.NoResultsError)
 
   """
-  def get_card!(id), do: Repo.get!(Card, id) |> Repo.preload(:answers)
+  def get_card(id) do
+    query = from c in Card, where: is_nil(c.deleted_at) and c.id == ^id
+
+    Repo.one(query) |> Repo.preload(:answers)
+  end
 
   @doc """
   Creates a card.
@@ -129,8 +133,10 @@ defmodule SpacedRep.Cards do
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_card(%Card{} = card) do
-    Repo.delete(card)
+  def delete_card(id) do
+    %Card{id: id}
+    |> change_card(%{deleted_at: DateTime.utc_now()})
+    |> Repo.update()
   end
 
   @doc """
