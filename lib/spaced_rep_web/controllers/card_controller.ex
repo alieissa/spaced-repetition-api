@@ -26,9 +26,8 @@ defmodule SpacedRepWeb.CardController do
   end
 
   def show(conn, %{"id" => id}, _) do
-    case Cards.get_card(id) do
-      %Card{} = card -> render(conn, :show, card: card)
-      nil -> send_resp(conn, :not_found, "")
+    with %Card{} = card <- Cards.get_card(id) do
+      render(conn, :show, card: card)
     end
   end
 

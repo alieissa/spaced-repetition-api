@@ -6,19 +6,18 @@ defmodule SpacedRepWeb.FallbackController do
   """
   use SpacedRepWeb, :controller
 
+  # This clause handles empty responses returned by Ecto's get.
+  def call(conn, nil) do
+    conn
+    |> resp(:not_found, "")
+    |> send_resp()
+  end
+
   # This clause handles errors returned by Ecto's insert/update/delete.
   def call(conn, {:error, %Ecto.Changeset{} = changeset}) do
     conn
     |> put_status(:unprocessable_entity)
     |> put_view(json: SpacedRepWeb.ChangesetJSON)
     |> render(:error, changeset: changeset)
-  end
-
-  # This clause is an example of how to handle resources that cannot be found.
-  def call(conn, {:error, :not_found}) do
-    conn
-    |> put_status(:not_found)
-    |> put_view(html: SpacedRepWeb.ErrorHTML, json: SpacedRepWeb.ErrorJSON)
-    |> render(:"404")
   end
 end

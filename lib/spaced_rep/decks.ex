@@ -24,15 +24,15 @@ defmodule SpacedRep.Decks do
   @doc """
   Gets a single deck.
 
-  Raises `Ecto.NoResultsError` if the Deck does not exist.
+  Return `nil` if the Deck does not exist.
 
   ## Examples
 
-      iex> get_deck!(123)
+      iex> get_deck(123)
       %Deck{}
 
-      iex> get_deck!(456)
-      ** (Ecto.NoResultsError)
+      iex> get_deck(456)
+      nil
 
   """
   def get_deck(id) do
