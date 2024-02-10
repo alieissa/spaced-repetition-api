@@ -33,10 +33,9 @@ defmodule SpacedRepWeb.CardController do
   end
 
   def update(conn, %{"id" => id}, card_params) do
-    card = Cards.get_card(id)
-
-    with {:ok, %Card{} = card} <- Cards.update_card(card, card_params) do
-      render(conn, :show, card: card)
+    with %Card{} = card <- Cards.get_card(id),
+         {:ok, %Card{} = updated_card} <- Cards.update_card(card, card_params) do
+      render(conn, :show, card: updated_card)
     end
   end
 
