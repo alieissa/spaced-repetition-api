@@ -19,7 +19,7 @@ defmodule SpacedRep.DecksTest do
     @tag :skip
     test "get_deck!/1 returns the deck with given id" do
       deck = insert(:deck)
-      assert Decks.get_deck!(deck.id) == deck
+      assert Decks.get_deck(deck.id) == deck
     end
 
     test "create_deck/1 with valid data creates a deck" do
@@ -50,14 +50,14 @@ defmodule SpacedRep.DecksTest do
     test "update_deck/2 with invalid data returns error changeset" do
       deck = insert(:deck)
       assert {:error, %Ecto.Changeset{}} = Decks.update_deck(deck, @invalid_attrs)
-      assert deck == Decks.get_deck!(deck.id)
+      assert deck == Decks.get_deck(deck.id)
     end
 
     @tag :skip
     test "delete_deck/1 deletes the deck" do
       deck = insert(:deck)
       assert {:ok, %Deck{}} = Decks.delete_deck(deck)
-      assert_raise Ecto.NoResultsError, fn -> Decks.get_deck!(deck.id) end
+      assert_raise Ecto.NoResultsError, fn -> Decks.get_deck(deck.id) end
     end
 
     test "change_deck/1 returns a deck changeset" do

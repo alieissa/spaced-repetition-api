@@ -23,9 +23,9 @@ defmodule SpacedRep.CardsTest do
     end
 
     @tag :skip
-    test "get_card!/1 returns the card with given id" do
+    test "get_card/1 returns the card with given id" do
       card = insert(:card) |> reset_fields([:deck])
-      assert Cards.get_card!(card.id) == card
+      assert Cards.get_card(card.id) == card
     end
 
     @tag :skip
@@ -147,13 +147,13 @@ defmodule SpacedRep.CardsTest do
     test "update_card/2 with invalid data returns error changeset" do
       card = insert(:card) |> reset_fields([:deck])
       assert {:error, %Ecto.Changeset{}} = Cards.update_card(card, @invalid_attrs)
-      assert card == Cards.get_card!(card.id)
+      assert card == Cards.get_card(card.id)
     end
 
     test "delete_card/1 deletes the card" do
       card = insert(:card)
-      assert {:ok, %Card{}} = Cards.delete_card(card)
-      assert_raise Ecto.NoResultsError, fn -> Cards.get_card!(card.id) end
+      assert {:ok, %Card{}} = Cards.delete_card(card.id)
+      assert nil == Cards.get_card(card.id)
     end
 
     test "change_card/1 returns a card changeset" do

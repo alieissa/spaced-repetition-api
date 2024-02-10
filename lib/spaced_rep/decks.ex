@@ -3,7 +3,7 @@ defmodule SpacedRep.Decks do
   The Decks context.
   """
 
-  import Ecto.Query, warn: false
+  import Ecto.Query, warn: false, only: [from: 2]
   alias SpacedRep.Repo
 
   alias SpacedRep.Decks.Deck
@@ -35,8 +35,10 @@ defmodule SpacedRep.Decks do
       ** (Ecto.NoResultsError)
 
   """
-  def get_deck!(id) do
-    Repo.get(Deck, id) |> Repo.preload(cards: [:answers])
+  def get_deck(id) do
+    query = from d in Deck, where: is_nil(d.deleted_at) and d.id == ^id
+
+    Repo.one(query) |> Repo.preload(cards: [:answers])
   end
 
   @doc """
@@ -96,8 +98,10 @@ defmodule SpacedRep.Decks do
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_deck(%Deck{} = deck) do
-    Repo.delete(deck)
+  def delete_deck(id) do
+    %Deck{id: id}
+    |> change_deck(%{deleted_at: DateTime.utc_now()})
+    |> Repo.update()
   end
 
   @doc """
