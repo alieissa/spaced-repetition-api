@@ -25,15 +25,15 @@ defmodule SpacedRep.Cards do
   @doc """
   Gets a single card.
 
-  Raises `Ecto.NoResultsError` if the Card does not exist.
+  Returns `nil` if the Card does not exist.
 
   ## Examples
 
       iex> get_card!(123)
       %Card{}
 
-      iex> get_card!(456)
-      ** (Ecto.NoResultsError)
+      iex> get_card(456)
+      ** nil
 
   """
   def get_card(id) do

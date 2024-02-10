@@ -4,7 +4,6 @@ defmodule SpacedRep.CardsTest do
   alias SpacedRep.Cards
   alias SpacedRep.Cards.Card
 
-  alias Ecto.UUID
   import SpacedRep.Factory
 
   describe "cards" do

@@ -4,8 +4,6 @@ defmodule SpacedRepWeb.DeckController do
   alias SpacedRep.Decks
   alias SpacedRep.Decks.Deck
 
-  require Logger
-
   action_fallback SpacedRepWeb.FallbackController
 
   def index(conn, _params) do
@@ -23,16 +21,14 @@ defmodule SpacedRepWeb.DeckController do
   end
 
   def show(conn, %{"id" => id}) do
-    case Decks.get_deck(id) do
-      %Deck{} = deck -> render(conn, :show, deck: deck)
-      nil -> send_resp(conn, :not_found, "")
+    with %Deck{} = deck <- Decks.get_deck(id) do
+      render(conn, :show, deck: deck)
     end
   end
 
   def update(conn, %{"id" => id} = deck_params) do
-    deck = Decks.get_deck(id)
-
-    with {:ok, %Deck{} = deck} <-
+    with %Deck{} = deck <- Decks.get_deck(id),
+         {:ok, %Deck{} = deck} <-
            Decks.update_deck(deck, deck_params) do
       render(conn, :show, deck: deck)
     end
@@ -40,7 +36,9 @@ defmodule SpacedRepWeb.DeckController do
 
   def delete(conn, %{"id" => id}) do
     with {:ok, %Deck{}} <- Decks.delete_deck(id) do
-      send_resp(conn, :no_content, "")
+      conn
+      |> resp(:no_content, "")
+      |> send_resp()
     end
   end
 end
