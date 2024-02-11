@@ -48,25 +48,32 @@ defmodule SpacedRepWeb.AnswerController do
 
   def check(conn, %{"card_id" => card_id}, %{"answer" => answer}) do
     with answers <- Answers.list_answers(card_id) do
-      closest_distance = get_closest(answer, answers)
-
-      conn
-      |> resp(:ok, "#{closest_distance}")
-      |> send_resp()
+      %{answer: answer, distance: distance} = get_closest(answer, answers)
+      render(conn, :show, answer: answer, distance: distance)
     end
   end
 
   defp get_closest(user_answer, answers) do
-    get_distance = fn answer ->
-      distance = Levenshtein.distance(user_answer, answer.content)
+    [first_answer | _rest] = answers
 
-      normalized_distance =
-        distance / max(String.length(user_answer), String.length(answer.content))
+    init_acc = %{
+      answer: first_answer,
+      distance: get_distance(user_answer, first_answer.content)
+    }
 
-      normalized_distance
-    end
+    Enum.reduce(answers, init_acc, fn answer, acc ->
+      %{distance: smallest_distance} = acc
+      distance = get_distance(user_answer, answer.content)
 
-    [head | _] = answers |> Enum.map(get_distance) |> Enum.sort()
-    head
+      if distance < smallest_distance,
+        do: %{distance: distance, answer: answer},
+        else: acc
+    end)
+  end
+
+  defp get_distance(sentence, otherSentence) do
+    distance = Levenshtein.distance(sentence, otherSentence)
+    longest_sentence_length = max(String.length(sentence), String.length(otherSentence))
+    distance / longest_sentence_length
   end
 end

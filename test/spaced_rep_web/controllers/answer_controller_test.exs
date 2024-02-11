@@ -101,9 +101,12 @@ defmodule SpacedRepWeb.AnswerControllerTest do
       card = insert(:card, %{answers: [%{content: "test 123"}]})
 
       conn =
-        post(conn, ~p"/decks/#{card.deck_id}/cards/#{card.id}/answers/check", %{answer: "test"})
+        post(conn, ~p"/decks/#{card.deck_id}/cards/#{card.id}/answers/check", %{
+          "answer" => "test"
+        })
 
-      assert "0.5" == response(conn, 200)
+      assert json_response(conn, 200)["answer"]["content"] == "test 123"
+      assert json_response(conn, 200)["distance"] == 0.5
     end
   end
 
