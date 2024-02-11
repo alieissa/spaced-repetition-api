@@ -4,6 +4,8 @@ defmodule SpacedRepWeb.CardController do
   alias SpacedRep.Cards
   alias SpacedRep.Cards.Card
 
+  alias SpacedRep.Answers
+
   action_fallback SpacedRepWeb.FallbackController
 
   def action(conn, _) do

@@ -45,4 +45,35 @@ defmodule SpacedRepWeb.AnswerController do
       send_resp(conn, :no_content, "")
     end
   end
+
+  def check(conn, %{"card_id" => card_id}, %{"answer" => answer}) do
+    with answers <- Answers.list_answers(card_id) do
+      %{answer: answer, distance: distance} = get_closest(answer, answers)
+      render(conn, :show, answer: answer, distance: distance)
+    end
+  end
+
+  defp get_closest(user_answer, answers) do
+    [first_answer | _rest] = answers
+
+    init_acc = %{
+      answer: first_answer,
+      distance: get_distance(user_answer, first_answer.content)
+    }
+
+    Enum.reduce(answers, init_acc, fn answer, acc ->
+      %{distance: smallest_distance} = acc
+      distance = get_distance(user_answer, answer.content)
+
+      if distance < smallest_distance,
+        do: %{distance: distance, answer: answer},
+        else: acc
+    end)
+  end
+
+  defp get_distance(sentence, otherSentence) do
+    distance = Levenshtein.distance(sentence, otherSentence)
+    longest_sentence_length = max(String.length(sentence), String.length(otherSentence))
+    distance / longest_sentence_length
+  end
 end

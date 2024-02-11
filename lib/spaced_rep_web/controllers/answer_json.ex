@@ -9,6 +9,13 @@ defmodule SpacedRepWeb.AnswerJSON do
   end
 
   @doc """
+  Renders a single answer and comparison distance
+  """
+  def show(%{answer: answer, distance: distance}) do
+    %{distance: distance, answer: data(answer)}
+  end
+
+  @doc """
   Renders a single answer.
   """
   def show(%{answer: answer}) do
