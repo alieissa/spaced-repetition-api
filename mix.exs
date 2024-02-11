@@ -43,6 +43,7 @@ defmodule SpacedRep.MixProject do
       {:jose, "~> 1.11"},
       {:plug_cowboy, "~> 2.5"},
       {:cors_plug, "~> 3.0"},
+      {:levenshtein, "~> 0.3.0"},
       {:ex_machina, "~> 2.7", only: [:test]}
     ]
   end
