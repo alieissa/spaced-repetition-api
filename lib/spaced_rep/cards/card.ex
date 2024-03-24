@@ -37,7 +37,7 @@ defmodule SpacedRep.Cards.Card do
     ])
     |> validate_required([:interval, :question])
     |> validate_number(:easiness, greater_than_or_equal_to: 1.3)
-    |> validate_number(:quality, greater_than: 0, less_than_or_equal_to: 5)
+    |> validate_number(:quality, greater_than_or_equal_to: 0, less_than_or_equal_to: 5)
     |> unique_constraint(:question)
     |> cast_assoc(:answers)
   end
