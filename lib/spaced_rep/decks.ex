@@ -7,6 +7,8 @@ defmodule SpacedRep.Decks do
   alias SpacedRep.Repo
 
   alias SpacedRep.Decks.Deck
+  alias SpacedRep.Cards.Card
+  alias SpacedRep.Answers.Answer
 
   @doc """
   Returns the list of decks.
@@ -87,6 +89,33 @@ defmodule SpacedRep.Decks do
   end
 
   @doc """
+  Uploads/inserts a list of decks.
+
+  ## Examples
+
+      iex> upload_decks(decks, user_id)
+      {:ok, %Deck{}}
+
+      iex> upload_decks(decks, user_id)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def upload_decks(decks, user_id) do
+    mapped_decks = Enum.map(decks, &map_imported_deck/1)
+
+    ops =
+      Enum.reduce(mapped_decks, Ecto.Multi.new(), fn deck, acc ->
+        Ecto.Multi.insert(
+          acc,
+          deck.name,
+          Deck.changeset(deck, user_id, %{})
+        )
+      end)
+
+    Repo.transaction(ops)
+  end
+
+  @doc """
   Deletes a deck.
 
   ## Examples
@@ -115,5 +144,22 @@ defmodule SpacedRep.Decks do
   """
   def change_deck(%Deck{} = deck, attrs \\ %{}) do
     Deck.changeset(deck, attrs)
+  end
+
+  """
+  Maps a list of %ImportedDeck{} to a list of %Deck{}
+  """
+
+  defp map_imported_deck(%{"name" => name, "cards" => imported_cards}) do
+    map_answers = fn answers ->
+      Enum.map(answers, fn answer -> %Answer{content: answer} end)
+    end
+
+    cards =
+      Enum.map(imported_cards, fn card ->
+        %Card{question: card["question"], answers: map_answers.(card["answers"])}
+      end)
+
+    %Deck{name: name, cards: cards}
   end
 end

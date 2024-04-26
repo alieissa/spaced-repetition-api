@@ -41,4 +41,11 @@ defmodule SpacedRepWeb.DeckController do
       |> send_resp()
     end
   end
+
+  def upload(conn, _opts) do
+    case Decks.upload_decks(conn.assigns.data, conn.assigns.user_id) do
+      {:ok, _} -> send_resp(conn, :created, "")
+      {:error, _} -> send_resp(conn, :unprocessable_entity, "")
+    end
+  end
 end

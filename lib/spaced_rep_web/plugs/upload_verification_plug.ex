@@ -1,0 +1,75 @@
+defmodule SpacedRepWeb.UploadVerificationPlug do
+  import Plug.Conn
+
+  def init(opts), do: opts
+
+  def call(%Plug.Conn{request_path: "/decks/upload", params: params} = conn, _opts) do
+    upload = params["filename"]
+
+    with {:ok, raw_content} = File.read(upload.path),
+         {:ok, decoded_content} = Jason.decode(raw_content) do
+      case validate_content(decoded_content) do
+        {:ok, valid_content} -> assign(conn, :data, valid_content)
+        {:error, _} -> send_resp(conn, 422, "Attempted to upload invalid data") |> halt()
+      end
+    end
+  end
+
+  def call(conn, _opts) do
+    conn
+  end
+
+  defp validate_content(content) do
+    changesets = SpacedRepWeb.Decks.ImportedDeck.changeset_all(content)
+
+    case changesets do
+      {_, false} -> {:error, content}
+      {_, true} -> {:ok, content}
+    end
+  end
+end
+
+defmodule SpacedRepWeb.Cards.ImportedCard do
+  use Ecto.Schema
+  import Ecto.Changeset
+
+  embedded_schema do
+    field :question, :string
+    field :answers, {:array, :string}
+  end
+
+  def changeset(%{} = imported_card, attrs) do
+    imported_card
+    |> cast(attrs, [:question, :answers])
+    |> validate_required([:question, :answers])
+    |> validate_length(:answers, min: 1)
+  end
+end
+
+defmodule SpacedRepWeb.Decks.ImportedDeck do
+  use Ecto.Schema
+  import Ecto.Changeset
+
+  embedded_schema do
+    field :name, :string
+    field :description, :string
+    embeds_many :cards, SpacedRepWeb.Cards.ImportedCard
+  end
+
+  def changeset(imported_deck, attrs \\ %{}) do
+    imported_deck
+    |> cast(attrs, [:name, :description])
+    |> validate_required(:name)
+    |> cast_embed(:cards, required: true)
+  end
+
+  def changeset_all(imported_decks) do
+    map_reduce_cb = fn deck, acc ->
+      chset = changeset(%__MODULE__{}, deck)
+      {chset, chset.valid? && acc}
+    end
+
+    imported_decks
+    |> Enum.map_reduce(true, fn deck, acc -> map_reduce_cb.(deck, acc) end)
+  end
+end
