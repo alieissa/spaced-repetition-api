@@ -15,12 +15,12 @@ defmodule SpacedRep.Decks.Deck do
     timestamps()
   end
 
-  @doc false
   def changeset(deck, user_id, attrs) do
     deck
     |> change(%{user_id: user_id})
     |> cast(attrs, [:description, :name, :user_id])
     |> validate_required([:name])
+    |> unique_constraint(:name)
     |> cast_assoc(:cards)
   end
 
