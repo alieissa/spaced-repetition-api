@@ -10,9 +10,10 @@ defmodule SpacedRepWeb.UploadVerificationPlug do
   '''
 
   def call(%Plug.Conn{request_path: "/decks/upload", params: params} = conn, _opts) do
-    data = params["data"]
+    file = params["file"]
 
-    with {:ok, decoded_content} = Jason.decode(data) do
+    with {:ok, raw_content} = File.read(file.path),
+         {:ok, decoded_content} = Jason.decode(raw_content) do
       case validate_content(decoded_content) do
         {:ok, valid_content} -> assign(conn, :data, valid_content)
         {:error, _} -> send_resp(conn, 422, "Attempted to upload invalid data") |> halt()
