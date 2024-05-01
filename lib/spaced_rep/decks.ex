@@ -24,6 +24,24 @@ defmodule SpacedRep.Decks do
   end
 
   @doc """
+  Gets all decks including cards.
+
+  Return `nil` if no decks.
+
+  ## Examples
+
+      iex> list_full_decks()
+      [%Deck{}]
+
+      iex> list_full_decks(456)
+      nil
+
+  """
+  def list_full_decks do
+    Repo.all(Deck) |> Repo.preload(cards: [:answers])
+  end
+
+  @doc """
   Gets a single deck.
 
   Return `nil` if the Deck does not exist.

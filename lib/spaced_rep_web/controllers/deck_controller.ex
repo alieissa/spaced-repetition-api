@@ -48,4 +48,19 @@ defmodule SpacedRepWeb.DeckController do
       {:error, _} -> send_resp(conn, :unprocessable_entity, "")
     end
   end
+
+  def download(conn, _opts) do
+    case Decks.list_full_decks() do
+      nil ->
+        conn |> send_resp(:ok, "No decks found")
+
+      decks ->
+        # TODO
+        # 1. Save decks in file
+        # 2. Send file to s3
+        # 3. Send file url in response
+        IO.inspect(Jason.encode(decks))
+        conn |> send_resp(:ok, "upload reached")
+    end
+  end
 end
