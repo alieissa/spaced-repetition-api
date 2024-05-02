@@ -66,7 +66,14 @@ defmodule SpacedRepWeb.DeckController do
   end
 
   defp s3_get_presigned_url(conn) do
+    opts = [
+      expires_in: 3600,
+      # The query params are crucial. They make the pre-signed url a url that the
+      # browser treats as download link
+      query_params: [{"response-content-disposition", "attachment; filename=decks.json"}]
+    ]
+
     ExAws.Config.new(:s3, [])
-    |> ExAws.S3.presigned_url(:get, conn.assigns.s3_bucket, conn.assigns.s3_path, [])
+    |> ExAws.S3.presigned_url(:get, conn.assigns.s3_bucket, conn.assigns.s3_path, opts)
   end
 end
