@@ -50,17 +50,23 @@ defmodule SpacedRepWeb.DeckController do
   end
 
   def download(conn, _opts) do
-    case Decks.list_full_decks() do
-      nil ->
-        conn |> send_resp(:ok, "No decks found")
-
-      decks ->
-        # TODO
-        # 1. Save decks in file
-        # 2. Send file to s3
-        # 3. Send file url in response
-        IO.inspect(Jason.encode(decks))
-        conn |> send_resp(:ok, "upload reached")
+    with decks when is_list(decks) <- Decks.list_full_decks(),
+         {:ok, content} <- Jason.encode(decks),
+         {:ok, _} <- s3_put_object(conn, content),
+         {:ok, url} <- s3_get_presigned_url(conn) do
+      send_resp(conn, :ok, url)
     end
+  end
+
+  defp s3_put_object(conn, content) do
+    ExAws.S3.put_object(conn.assigns.s3_bucket, conn.assigns.s3_path, content, [
+      {:content_type, "application/json"}
+    ])
+    |> ExAws.request()
+  end
+
+  defp s3_get_presigned_url(conn) do
+    ExAws.Config.new(:s3, [])
+    |> ExAws.S3.presigned_url(:get, conn.assigns.s3_bucket, conn.assigns.s3_path, [])
   end
 end
