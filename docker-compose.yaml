@@ -2,7 +2,7 @@
 
 version: '3.9' # optional since v1.27.0
 services:
-  server:
+  api:
     build:
       context: .
       dockerfile: Dockerfile.dev
@@ -10,13 +10,13 @@ services:
       - .:/app
     ports:
       - 8000:8000
-    environment:
-      POSTGRES_PASSWORD: postgres
-      PORT: 8000
+    env_file:
+      - .env.dev
     entrypoint: './init.sh'
+
   db:
     image: postgres:14.7
     ports:
-      - '5432:5432'
-    environment:
-      POSTGRES_PASSWORD: postgres
+      - 5432:5432
+    env_file:
+      - .env.dev
