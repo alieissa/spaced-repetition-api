@@ -2,7 +2,9 @@ defmodule SpacedRep.Answers.Answer do
   use Ecto.Schema
   import Ecto.Changeset
 
-  @derive {Jason.Encoder, only: [:id, :content]}
+  @derive {Jason.Encoder, only: [:id, :content, :inserted_at, :updated_at]}
+
+  # TODO Add deleted_at nullable deleted_at field to schema
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   @timestamps_opts [type: :utc_datetime]

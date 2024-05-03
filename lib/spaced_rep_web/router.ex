@@ -30,6 +30,7 @@ defmodule SpacedRepWeb.Router do
     get "/", DeckController, :index
     post "/", DeckController, :create
     post "/upload", DeckController, :upload
+    get "/download", DeckController, :download
     get "/:id", DeckController, :show
     put "/:id", DeckController, :update
     delete "/:id", DeckController, :delete

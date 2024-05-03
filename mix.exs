@@ -44,6 +44,10 @@ defmodule SpacedRep.MixProject do
       {:plug_cowboy, "~> 2.5"},
       {:cors_plug, "~> 3.0"},
       {:levenshtein, "~> 0.3.0"},
+      {:ex_aws, "~> 2.1"},
+      {:ex_aws_s3, "~> 2.0"},
+      {:hackney, "~> 1.9"},
+      {:sweet_xml, "~> 0.6"},
       {:ex_machina, "~> 2.7", only: [:test]}
     ]
   end

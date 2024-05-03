@@ -48,4 +48,32 @@ defmodule SpacedRepWeb.DeckController do
       {:error, _} -> send_resp(conn, :unprocessable_entity, "")
     end
   end
+
+  def download(conn, _opts) do
+    with decks when is_list(decks) <- Decks.list_full_decks(),
+         {:ok, content} <- Jason.encode(decks),
+         {:ok, _} <- s3_put_object(conn, content),
+         {:ok, url} <- s3_get_presigned_url(conn) do
+      send_resp(conn, :ok, url)
+    end
+  end
+
+  defp s3_put_object(conn, content) do
+    ExAws.S3.put_object(conn.assigns.s3_bucket, conn.assigns.s3_path, content, [
+      {:content_type, "application/json"}
+    ])
+    |> ExAws.request()
+  end
+
+  defp s3_get_presigned_url(conn) do
+    opts = [
+      expires_in: 3600,
+      # The query params are crucial. They make the pre-signed url a url that the
+      # browser treats as download link
+      query_params: [{"response-content-disposition", "attachment; filename=decks.json"}]
+    ]
+
+    ExAws.Config.new(:s3, [])
+    |> ExAws.S3.presigned_url(:get, conn.assigns.s3_bucket, conn.assigns.s3_path, opts)
+  end
 end

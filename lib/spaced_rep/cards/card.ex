@@ -2,7 +2,8 @@ defmodule SpacedRep.Cards.Card do
   use Ecto.Schema
   import Ecto.Changeset
 
-  @derive {Jason.Encoder, only: [:id, :question, :answers]}
+  @derive {Jason.Encoder,
+           only: [:id, :question, :answers, :inserted_at, :updated_at, :deleted_at]}
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id

@@ -21,6 +21,15 @@ defmodule SpacedRepWeb.UploadVerificationPlug do
     end
   end
 
+  def call(%Plug.Conn{request_path: "/decks/download"} = conn, _opts) do
+    timestamp = System.os_time(:millisecond)
+    s3_object_name = "decks-#{conn.assigns.user_id}-#{timestamp}.json"
+    s3_path = "/#{s3_object_name}"
+    s3_bucket = System.get_env("AWS_S3_BUCKET")
+
+    conn |> assign(:s3_bucket, s3_bucket) |> assign(:s3_path, s3_path)
+  end
+
   def call(conn, _opts) do
     conn
   end
