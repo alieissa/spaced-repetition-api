@@ -27,7 +27,7 @@ defmodule SpacedRep.Decks.Deck do
     |> cast_assoc(:cards)
   end
 
-  def changeset(deck, attrs = %{deleted_at: _deleted_at} = attrs) do
+  def changeset(deck, %{deleted_at: _deleted_at} = attrs) do
     deck
     |> change(attrs)
     |> cast(attrs, [:deleted_at])
