@@ -8,7 +8,26 @@ env:
   IMAGE_NAME: spaced-repetition-api
 
 jobs:
+  static_analysis:
+    name: Static Analysis
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        otp: ['25.2.3']
+        elixir: ['1.14.3']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: ${{matrix.otp}}
+          elixir-version: ${{matrix.elixir}}
+      
+      - name: Run static analysis
+        run: |
+          mix deps.get
+          mix credo
   tests:
+    needs: static_analysis
     runs-on: ubuntu-20.04
     name: Test
     services:

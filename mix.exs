@@ -48,7 +48,8 @@ defmodule SpacedRep.MixProject do
       {:ex_aws_s3, "~> 2.0"},
       {:hackney, "~> 1.9"},
       {:sweet_xml, "~> 0.6"},
-      {:ex_machina, "~> 2.7", only: [:test]}
+      {:ex_machina, "~> 2.7", only: [:test]},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
     ]
   end
 
