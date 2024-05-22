@@ -12,18 +12,10 @@ defmodule SpacedRepWeb.DeckJSON do
   Renders a single deck.
   """
   def show(%{deck: deck}) do
-    full_data(deck)
+    data(deck)
   end
 
   defp data(%Deck{} = deck) do
-    %{
-      id: deck.id,
-      description: deck.description,
-      name: deck.name
-    }
-  end
-
-  defp full_data(%Deck{} = deck) do
     %{
       id: deck.id,
       description: deck.description,

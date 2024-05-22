@@ -18,27 +18,12 @@ defmodule SpacedRep.Decks do
       iex> list_decks()
       [%Deck{}, ...]
 
-  """
-  def list_decks do
-    Repo.all(Deck)
-  end
-
-  @doc """
-  Gets all decks including cards.
-
-  Return `nil` if no decks.
-
-  ## Examples
-
-      iex> list_full_decks()
-      [%Deck{}]
-
-      iex> list_full_decks(456)
+      iex> list_decks()
       nil
 
   """
-  def list_full_decks do
-    Repo.all(Deck) |> Repo.preload(cards: [:answers])
+  def list_decks do
+    Deck |> Repo.all() |> Repo.preload(cards: [:answers])
   end
 
   @doc """
