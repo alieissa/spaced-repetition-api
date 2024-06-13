@@ -3,13 +3,6 @@ on:
     types: [opened, synchronize, closed]
     branches:
       - main
-  push:
-    branches:
-      - 45-redeploy-service-after-merge
-# env:
-#   REPO: 079829475258.dkr.ecr.us-east-1.amazonaws.com
-#   IMAGE_NAME: spaced-repetition-api
-
 jobs:
   static_analysis:
     name: Static Analysis
@@ -67,7 +60,7 @@ jobs:
     
   release:
     needs: tests
-    # if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-20.04
     name: Release
     strategy:
