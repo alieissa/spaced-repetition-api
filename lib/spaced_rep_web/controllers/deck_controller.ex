@@ -50,7 +50,7 @@ defmodule SpacedRepWeb.DeckController do
   end
 
   def download(conn, _opts) do
-    with decks when is_list(decks) <- Decks.list_full_decks(),
+    with decks when is_list(decks) <- Decks.list_decks(),
          {:ok, content} <- Jason.encode(decks),
          {:ok, _} <- s3_put_object(conn, content),
          {:ok, url} <- s3_get_presigned_url(conn) do
