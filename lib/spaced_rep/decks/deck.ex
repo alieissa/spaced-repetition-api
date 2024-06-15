@@ -18,25 +18,24 @@ defmodule SpacedRep.Decks.Deck do
     timestamps()
   end
 
-  def changeset(deck, user_id, attrs) do
-    deck
-    |> change(%{user_id: user_id})
-    |> cast(attrs, [:description, :name, :user_id])
-    |> validate_required([:name])
-    |> unique_constraint(:name)
-    |> cast_assoc(:cards)
-  end
-
   def changeset(deck, %{deleted_at: _deleted_at} = attrs) do
     deck
     |> change(attrs)
     |> cast(attrs, [:deleted_at])
   end
 
+  def changeset(deck, %{id: _id} = attrs) do
+    deck
+    |> change(attrs)
+    |> unique_constraint(:name)
+    |> cast_assoc(:cards)
+  end
+
   def changeset(deck, attrs) do
     deck
-    |> cast(attrs, [:description, :name])
-    |> validate_required([:name])
+    |> cast(attrs, [:description, :name, :user_id])
+    |> validate_required([:name, :user_id])
+    |> unique_constraint(:name)
     |> cast_assoc(:cards)
   end
 end

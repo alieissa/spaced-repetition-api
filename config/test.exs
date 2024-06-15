@@ -6,10 +6,10 @@ import Config
 # to provide built-in test partitioning in CI environment.
 # Run `mix help test` for more information.
 config :spaced_rep, SpacedRep.Repo,
-  username: System.get_env("POSTGRES_USERNAME", "postgres"),
-  password: System.get_env("POSTGRES_PASSWORD", "postgres"),
-  hostname: System.get_env("POSTGRES_HOSTNAME", "localhost"),
-  database: System.get_env("POSTGRES_DB", "spaced_rep_test"),
+  username: System.get_env("DB_USERNAME", "postgres"),
+  password: System.get_env("DB_PASSWORD", "postgres"),
+  hostname: System.get_env("DB_HOSTNAME", "localhost"),
+  database: System.get_env("DB_NAME", "spaced_rep_test"),
   pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: 10
 

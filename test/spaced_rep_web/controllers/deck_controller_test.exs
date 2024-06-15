@@ -3,10 +3,9 @@ defmodule SpacedRepWeb.DeckControllerTest do
 
   import SpacedRep.Factory
 
-  alias Ecto.UUID
-  alias SpacedRep.Decks.Deck
   alias SpacedRep.TestUtils, as: Utils
 
+  @user_id Ecto.UUID.autogenerate()
   @create_attrs %{
     name: "some name",
     description: "some description"
@@ -17,7 +16,7 @@ defmodule SpacedRepWeb.DeckControllerTest do
   @invalid_attrs %{name: nil, description: "some updated description"}
 
   setup %{conn: conn} do
-    token = Utils.get_token(%{"sub" => UUID.autogenerate()})
+    token = Utils.get_token(%{"sub" => @user_id})
 
     conn =
       conn
@@ -36,22 +35,10 @@ defmodule SpacedRepWeb.DeckControllerTest do
 
   describe "create deck" do
     test "renders deck when data is valid", %{conn: conn} do
-      # Conn.assign(conn, :user_id, UUID.autogenerate())
+      conn = post(conn, ~p"/decks", @create_attrs)
 
-      conn =
-        conn
-        |> assign(:usr_id, UUID.autogenerate())
-        |> post(~p"/decks", @create_attrs)
-
-      assert %{"id" => id} = json_response(conn, 201)
-
-      conn = get(conn, ~p"/decks/#{id}")
-
-      assert %{
-               "id" => ^id,
-               "description" => "some description",
-               "name" => "some name"
-             } = json_response(conn, 200)
+      assert %{"description" => "some description", "name" => "some name"} =
+               json_response(conn, 201)
     end
 
     test "renders errors when data is invalid", %{conn: conn} do
@@ -61,9 +48,8 @@ defmodule SpacedRepWeb.DeckControllerTest do
   end
 
   describe "update deck" do
-    setup [:create_deck]
-
-    test "renders deck when data is valid", %{conn: conn, deck: %Deck{id: id}} do
+    test "renders deck when data is valid", %{conn: conn} do
+      %{id: id} = insert(:deck, %{user_id: @user_id})
       conn = put(conn, ~p"/decks/#{id}", @update_attrs)
       assert %{"id" => ^id} = json_response(conn, 200)
 
@@ -75,16 +61,16 @@ defmodule SpacedRepWeb.DeckControllerTest do
              } = json_response(conn, 200)
     end
 
-    test "renders errors when data is invalid", %{conn: conn, deck: deck} do
-      conn = put(conn, ~p"/decks/#{deck}", @invalid_attrs)
+    test "renders errors when data is invalid", %{conn: conn} do
+      %{id: id} = insert(:deck, %{user_id: @user_id})
+      conn = put(conn, ~p"/decks/#{id}", @invalid_attrs)
       assert json_response(conn, 422)["errors"] != %{}
     end
   end
 
   describe "delete deck" do
-    setup [:create_deck]
-
-    test "deletes chosen deck", %{conn: conn, deck: deck} do
+    test "deletes chosen deck", %{conn: conn} do
+      deck = insert(:deck, %{name: "test123"})
       conn = delete(conn, ~p"/decks/#{deck}")
       assert response(conn, 204)
 
@@ -92,11 +78,4 @@ defmodule SpacedRepWeb.DeckControllerTest do
       assert response(conn, 404)
     end
   end
-
-  defp create_deck(_) do
-    deck = insert(:deck)
-    %{deck: deck}
-  end
 end
-
-# %Deck{"id" => id} = deck
