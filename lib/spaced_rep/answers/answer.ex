@@ -17,7 +17,16 @@ defmodule SpacedRep.Answers.Answer do
     timestamps()
   end
 
-  @doc false
+  @doc """
+  Delete answer changeset
+  """
+  def changeset(answer, %{"deleted_at" => _deleted_at} = attrs) do
+    answer |> cast(attrs, [:deleted_at])
+  end
+
+  @doc """
+  Update answer changeset
+  """
   def changeset(answer, attrs) do
     answer
     |> cast(attrs, [:content])

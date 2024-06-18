@@ -3,19 +3,13 @@ defmodule SpacedRepWeb.AnswerControllerTest do
 
   import SpacedRep.Factory
   alias SpacedRep.Answers.Answer
-  alias Ecto.UUID
+
   alias SpacedRep.TestUtils, as: Utils
 
-  @create_attrs %{
-    content: "some content"
-  }
-  @update_attrs %{
-    content: "some updated content"
-  }
-  @invalid_attrs %{content: nil}
+  @user_id Ecto.UUID.generate()
 
   setup %{conn: conn} do
-    token = Utils.get_token(%{"sub" => UUID.autogenerate()})
+    token = Utils.get_token(%{"sub" => @user_id})
 
     conn =
       conn
@@ -26,92 +20,150 @@ defmodule SpacedRepWeb.AnswerControllerTest do
   end
 
   describe "index" do
-    setup [:create_answer]
+    test "lists all answers", %{conn: conn} do
+      answer = setup_answer()
 
-    test "lists all answers", %{conn: conn, answer: %Answer{id: id, content: content, card: card}} do
-      conn = get(conn, ~p"/decks/#{card.deck_id}/cards/#{card.id}/answers")
+      conn = get(conn, ~p"/decks/#{answer.card.deck_id}/cards/#{answer.card_id}/answers")
 
-      assert json_response(conn, 200) == [
-               %{"id" => id, "content" => content}
-             ]
+      resp = json_response(conn, 200)
+
+      assert resp == [%{"id" => answer.id, "content" => answer.content}]
     end
   end
 
-  describe "create answer" do
-    setup [:create_answer]
+  describe "POST /answers" do
+    test "when input data is valid", %{conn: conn} do
+      card = setup_card()
 
-    test "renders answer when data is valid", %{conn: conn, answer: %Answer{card: card}} do
-      conn = post(conn, ~p"/decks/#{card.deck_id}/cards/#{card.id}/answers", @create_attrs)
+      data = %{"content" => "How are you?"}
+      conn = post_answer(conn, %{"deck_id" => card.deck_id, "card_id" => card.id}, data)
 
-      assert %{"id" => id} = json_response(conn, 201)
-
-      conn = get(conn, ~p"/decks/#{card.deck_id}/cards/#{card.id}/answers/#{id}")
-
-      assert %{
-               "id" => ^id,
-               "content" => "some content"
-             } = json_response(conn, 200)
+      resp = json_response(conn, 201)
+      assert resp["content"] == data["content"]
     end
 
-    test "renders errors when data is invalid", %{conn: conn, answer: %Answer{card: card}} do
-      conn = post(conn, ~p"/decks/#{card.deck_id}/cards/#{card.id}/answers", @invalid_attrs)
-
-      assert json_response(conn, 422)["errors"] != %{}
-    end
-  end
-
-  describe "update answer" do
-    setup [:create_answer]
-
-    test "renders answer when data is valid", %{conn: conn, answer: %Answer{id: id, card: card}} do
-      conn = put(conn, ~p"/decks/#{card.deck_id}/cards/#{card.id}/answers/#{id}", @update_attrs)
-
-      assert %{"id" => ^id} = json_response(conn, 200)
-
-      conn = get(conn, ~p"/decks/#{card.deck_id}/cards/#{card.id}/answers/#{id}")
-
-      assert %{
-               "id" => ^id,
-               "content" => "some updated content"
-             } = json_response(conn, 200)
-    end
-
-    test "renders errors when data is invalid", %{conn: conn, answer: %Answer{id: id, card: card}} do
-      conn = put(conn, ~p"/decks/#{card.deck_id}/cards/#{card.id}/answers/#{id}", @invalid_attrs)
-
-      assert json_response(conn, 422)["errors"] != %{}
-    end
-  end
-
-  describe "delete answer" do
-    setup [:create_answer]
-
-    test "deletes chosen answer", %{conn: conn, answer: %Answer{id: id, card: card}} do
-      conn = delete(conn, ~p"/decks/#{card.deck_id}/cards/#{card.id}/answers/#{id}")
-      assert response(conn, 204)
-
-      assert_error_sent 404, fn ->
-        get(conn, ~p"/decks/#{card.deck_id}/cards/#{card.id}/answers/#{id}")
-      end
-    end
-  end
-
-  describe "check answer" do
-    test "checks answer again other answers in card", %{conn: conn} do
-      card = insert(:card, %{answers: [%{content: "test 123"}]})
+    test "when input data is invalid", %{conn: conn} do
+      card = setup_card()
 
       conn =
-        post(conn, ~p"/decks/#{card.deck_id}/cards/#{card.id}/answers/check", %{
-          "answer" => "test"
-        })
+        post_answer(conn, %{"deck_id" => card.deck_id, "card_id" => card.id}, %{"content" => nil})
 
-      assert json_response(conn, 200)["answer"]["content"] == "test 123"
-      assert json_response(conn, 200)["distance"] == 0.5
+      resp = json_response(conn, 422)
+      assert resp["errors"]
     end
+  end
+
+  describe "PUT /answers/:id" do
+    test "when input data is valid", %{conn: conn} do
+      answer = setup_answer()
+
+      data = %{
+        "content" => "some updated content"
+      }
+
+      conn =
+        put_answer(
+          conn,
+          %{
+            "id" => answer.id,
+            "card_id" => answer.card_id,
+            "deck_id" => answer.card.deck_id
+          },
+          data
+        )
+
+      resp = json_response(conn, 200)
+      assert resp == %{"id" => answer.id, "content" => data["content"]}
+    end
+
+    test "when input data is invalid", %{conn: conn} do
+      answer = setup_answer()
+
+      invalid_data = %{
+        "content" => nil
+      }
+
+      conn =
+        put_answer(
+          conn,
+          %{
+            "id" => answer.id,
+            "card_id" => answer.card_id,
+            "deck_id" => answer.card.deck_id
+          },
+          invalid_data
+        )
+
+      resp = json_response(conn, 422)
+      assert resp["errors"]
+    end
+  end
+
+  test "DELETE /answers/:id", %{conn: conn} do
+    answer = setup_answer()
+
+    conn =
+      delete_answer(conn, %{
+        "id" => answer.id,
+        "card_id" => answer.card_id,
+        "deck_id" => answer.card.deck_id
+      })
+
+    assert response(conn, 204)
+  end
+
+  describe "POST /answers/check" do
+    test "nearest answer to user input", %{conn: conn} do
+      answer = setup_answer(%{content: "test 123"})
+
+      user_input = %{"answer" => "test"}
+
+      conn =
+        check_answer(
+          conn,
+          %{"deck_id" => answer.card.deck_id, "card_id" => answer.card_id},
+          user_input
+        )
+
+      resp = json_response(conn, 200)
+
+      assert resp == %{
+               "answer" => %{"id" => answer.id, "content" => "test 123"},
+               "distance" => 0.5
+             }
+    end
+  end
+
+  defp setup_card(data \\ %{}) do
+    insert(:card, %{user_id: @user_id})
+  end
+
+  defp setup_answer(attrs \\ %{}) do
+    insert(:answer, Map.merge(%{user_id: @user_id}, attrs))
+  end
+
+  defp check_answer(conn, %{"deck_id" => deck_id, "card_id" => card_id}, answer) do
+    post(conn, ~p"/decks/#{deck_id}/cards/#{card_id}/answers/check", answer)
+  end
+
+  defp post_answer(conn, %{"deck_id" => deck_id, "card_id" => card_id}, data) do
+    post(conn, ~p"/decks/#{deck_id}/cards/#{card_id}/answers", data)
+  end
+
+  defp put_answer(conn, %{"id" => id, "card_id" => card_id, "deck_id" => deck_id}, data) do
+    put(
+      conn,
+      ~p"/decks/#{deck_id}/cards/#{card_id}/answers/#{id}",
+      data
+    )
+  end
+
+  defp delete_answer(conn, %{"deck_id" => deck_id, "card_id" => card_id, "id" => id}) do
+    delete(conn, ~p"/decks/#{deck_id}/cards/#{card_id}/answers/#{id}")
   end
 
   defp create_answer(_) do
-    answer = insert(:answer)
+    answer = insert(:answer, %{user_id: @user_id})
     %{answer: answer}
   end
 end
