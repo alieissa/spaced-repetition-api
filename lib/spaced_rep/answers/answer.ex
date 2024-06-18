@@ -10,6 +10,8 @@ defmodule SpacedRep.Answers.Answer do
   @timestamps_opts [type: :utc_datetime]
   schema "answers" do
     field :content, :string
+    field :user_id, :binary_id
+    field :deleted_at, :utc_datetime
     belongs_to :card, SpacedRep.Cards.Card
 
     timestamps()
