@@ -12,13 +12,11 @@ defmodule SpacedRepWeb.DeckController do
   end
 
   def create(conn, deck_params) do
-    deck_params_with_user_id = Map.put_new(deck_params, "user_id", conn.assigns.user_id)
-
     with {:ok, %Deck{} = deck} <-
-           Decks.create_deck(deck_params_with_user_id) do
+           Decks.create_deck(%{"user_id" => conn.assigns.user_id}, deck_params) do
       conn
       |> put_status(:created)
-      |> put_resp_header("location", ~p"/decks/#{deck}")
+      |> put_resp_header("location", ~p"/decks/#{deck.id}")
       |> render(:show, deck: deck)
     end
   end
@@ -31,7 +29,7 @@ defmodule SpacedRepWeb.DeckController do
 
   def update(conn, %{"id" => id} = deck_params) do
     with {:ok, %Deck{} = deck} <-
-           Decks.update_deck(id, Map.put_new(deck_params, "user_id", conn.assigns.user_id)) do
+           Decks.update_deck(%{"id" => id, "user_id" => conn.assigns.user_id}, deck_params) do
       render(conn, :show, deck: deck)
     end
   end

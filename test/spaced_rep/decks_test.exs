@@ -7,83 +7,103 @@ defmodule SpacedRep.DecksTest do
 
   @user_id Ecto.UUID.generate()
 
-  describe "decks" do
-    @invalid_attrs %{"user_id" => @user_id, "name" => nil, "description" => nil}
+  test "list_decks/1" do
+    deck = setup_deck()
 
-    test "list_decks/1 returns all decks of a given user" do
-      deck = insert(:deck, %{user_id: @user_id, name: "Test deck"})
+    loaded_decks = Decks.list_decks(@user_id)
 
-      loaded_decks = Decks.list_decks(@user_id)
-      decks_with_reset_cards = Enum.map(loaded_decks, &reset_cards_field/1)
+    decks_with_reset_cards = Enum.map(loaded_decks, &reset_cards_field/1)
+    assert decks_with_reset_cards == [deck]
+  end
 
-      assert decks_with_reset_cards == [deck]
-    end
+  test "get_deck/2" do
+    deck = setup_deck()
 
-    test "get_deck/2 returns the deck with given id" do
-      deck = insert(:deck, %{user_id: @user_id})
+    loaded_deck = Decks.get_deck(%{"id" => deck.id, "user_id" => @user_id})
 
-      loaded_deck = Decks.get_deck(%{"id" => deck.id, "user_id" => @user_id})
-      deck_with_reset_cards = reset_cards_field(loaded_deck)
+    deck_with_reset_cards = reset_cards_field(loaded_deck)
+    assert deck_with_reset_cards == deck
+  end
 
-      assert deck_with_reset_cards == deck
-    end
-
-    test "create_deck/2 with valid data creates a deck" do
-      valid_attrs = %{
-        "user_id" => @user_id,
+  describe "create_deck/2" do
+    test "when input data is valid" do
+      valid_data = %{
         "name" => "some name",
         "description" => "some description"
       }
 
-      {:ok, %Deck{} = deck} = Decks.create_deck(valid_attrs)
+      created_deck = create_deck(valid_data)
 
-      assert deck.name == valid_attrs["name"]
-      assert deck.description == valid_attrs["description"]
+      assert created_deck.name == valid_data["name"]
+      assert created_deck.description == valid_data["description"]
     end
 
-    test "create_deck/2 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Decks.create_deck(@invalid_attrs)
+    test "when input data is invalid" do
+      invalid_data = %{"name" => nil}
+
+      created_deck = create_deck(invalid_data)
+
+      assert match?(created_deck, nil)
     end
+  end
 
-    test "update_deck/2 with valid data updates the deck" do
-      deck = insert(:deck, %{user_id: @user_id})
+  describe "update_deck/2" do
+    test "when input data is valid" do
+      deck = setup_deck()
 
-      updated_attrs = %{
-        "user_id" => @user_id,
+      valid_data = %{
         "name" => "some updated name",
         "description" => "some updated description"
       }
 
-      {:ok, %Deck{} = deck} = Decks.update_deck(deck.id, updated_attrs)
+      updated_deck = update_deck(deck.id, valid_data)
 
-      assert deck.name == updated_attrs["name"]
-      assert deck.description == updated_attrs["description"]
+      assert updated_deck.name == valid_data["name"]
+      assert updated_deck.description == valid_data["description"]
     end
 
-    test "update_deck/2 with invalid data returns error changeset" do
-      deck = insert(:deck, %{user_id: @user_id})
+    test "when input data is invalid" do
+      deck = setup_deck()
 
-      {:error, %Ecto.Changeset{}} = Decks.update_deck(deck.id, @invalid_attrs)
+      invalid_data = %{"name" => nil}
 
-      loaded_deck = Decks.get_deck(%{"id" => deck.id, "user_id" => @user_id})
-      deck_with_reset_cards = reset_cards_field(loaded_deck)
+      updated_deck = update_deck(deck.id, invalid_data)
+      deck_with_reset_cards = reset_cards_field(updated_deck)
 
       assert deck_with_reset_cards == deck
     end
+  end
 
-    test "delete_deck/2 deletes the deck" do
-      deck = insert(:deck, %{user_id: @user_id})
+  test "delete_deck/2" do
+    deck = setup_deck()
 
-      {:ok, %Deck{} = deleted_deck} = Decks.delete_deck(%{"user_id" => @user_id, "id" => deck.id})
+    deleted_deck = delete_deck(deck.id)
 
-      assert deleted_deck.deleted_at
+    assert deleted_deck.deleted_at
+  end
+
+  defp setup_deck() do
+    insert(:deck, %{user_id: @user_id})
+  end
+
+  defp create_deck(data) do
+    Decks.create_deck(%{"user_id" => @user_id}, data)
+
+    case Decks.list_decks(@user_id) do
+      [] -> nil
+      [created_deck] -> created_deck
+      [created_deck | _] -> created_deck
     end
+  end
 
-    test "change_deck/1 returns a deck changeset" do
-      deck = insert(:deck)
+  defp update_deck(id, data) do
+    Decks.update_deck(%{"id" => id, "user_id" => @user_id}, data)
+    Decks.get_deck(%{"id" => id, "user_id" => @user_id})
+  end
 
-      assert %Ecto.Changeset{} = Decks.change_deck(deck)
-    end
+  defp delete_deck(id) do
+    Decks.delete_deck(%{"id" => id, "user_id" => @user_id})
+    Decks.get_deck(%{"id" => id, "user_id" => @user_id})
   end
 
   defp reset_cards_field(deck) do

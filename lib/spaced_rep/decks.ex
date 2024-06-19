@@ -15,15 +15,15 @@ defmodule SpacedRep.Decks do
 
   ## Examples
 
-      iex> list_decks()
+      iex> list_decks(123)
       [%Deck{}, ...]
 
-      iex> list_decks()
+      iex> list_decks(456)
       nil
 
   """
   def list_decks(user_id) do
-    query = from d in Deck, where: d.user_id == ^user_id
+    query = from d in Deck, where: d.user_id == ^user_id and is_nil(d.deleted_at)
     query |> Repo.all() |> Repo.preload(cards: [:answers])
   end
 
@@ -34,10 +34,10 @@ defmodule SpacedRep.Decks do
 
   ## Examples
 
-      iex> get_deck(%{"id" => 123, "user_id" => 123})
+      iex> get_deck(%{"id" => 123, "user_id" => 456})
       %Deck{}
 
-      iex> get_deck(%{"id" => 123, "user_id" => 456})
+      iex> get_deck(%{"id" => 123, "user_id" => 789})
       nil
 
   """
@@ -58,8 +58,8 @@ defmodule SpacedRep.Decks do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_deck(attrs \\ %{}) do
-    %Deck{}
+  def create_deck(%{"user_id" => user_id}, attrs \\ %{}) do
+    %Deck{user_id: user_id}
     |> Deck.changeset(attrs)
     |> Repo.insert()
     |> case do
@@ -73,15 +73,15 @@ defmodule SpacedRep.Decks do
 
   ## Examples
 
-      iex> update_deck(123, %{"name" => "updated name"})
+      iex> update_deck(%{"id" => 123, "user_id" => 456}, %{"name" => "updated name"})
       {:ok, %Deck{}}
 
-      iex> update_deck(456, %{"name" => nil})
+      iex> update_deck(%{"id" => 123, "user_id" => 456}, %{"name" => nil})
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_deck(id, %{"user_id" => _user_id} = attrs) do
-    %Deck{id: id}
+  def update_deck(%{"id" => id, "user_id" => user_id}, attrs) do
+    get_deck(%{"id" => id, "user_id" => user_id})
     |> Deck.changeset(attrs)
     ## TODO Upsert nested cards and answers
     |> Repo.update()
@@ -131,9 +131,7 @@ defmodule SpacedRep.Decks do
 
   """
   def delete_deck(%{"id" => id, "user_id" => user_id}) do
-    %Deck{id: id, user_id: user_id}
-    |> change_deck(%{deleted_at: DateTime.utc_now()})
-    |> Repo.update()
+    update_deck(%{"id" => id, "user_id" => user_id}, %{"deleted_at" => DateTime.utc_now()})
   end
 
   @doc """

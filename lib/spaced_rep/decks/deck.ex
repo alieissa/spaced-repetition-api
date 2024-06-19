@@ -18,12 +18,17 @@ defmodule SpacedRep.Decks.Deck do
     timestamps()
   end
 
-  def changeset(deck, %{deleted_at: _deleted_at} = attrs) do
+  @doc """
+  Delete deck changeset
+  """
+  def changeset(deck, %{"deleted_at" => _deleted_at} = attrs) do
     deck
-    |> change(attrs)
     |> cast(attrs, [:deleted_at])
   end
 
+  @doc """
+  Update deck changeset
+  """
   def changeset(deck, %{id: _id} = attrs) do
     deck
     |> change(attrs)
@@ -31,6 +36,9 @@ defmodule SpacedRep.Decks.Deck do
     |> cast_assoc(:cards)
   end
 
+  @doc """
+  Create deck changeset
+  """
   def changeset(deck, attrs) do
     deck
     |> cast(attrs, [:description, :name, :user_id])
