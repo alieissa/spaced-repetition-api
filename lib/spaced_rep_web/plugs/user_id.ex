@@ -4,12 +4,6 @@ defmodule SpacedRepWeb.Plugs.UserID do
 
   def init(opts), do: opts
 
-  def call(%Plug.Conn{request_path: "/health"} = conn, _opts) do
-    conn
-    |> send_resp(200, "healthy")
-    |> halt()
-  end
-
   def call(conn, _opts) do
     with [token] <- get_req_header(conn, "authorization"),
          %JOSE.JWT{fields: %{"sub" => user_id}} <- JOSE.JWT.peek_payload(token) do
