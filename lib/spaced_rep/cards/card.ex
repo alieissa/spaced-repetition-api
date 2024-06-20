@@ -2,6 +2,9 @@ defmodule SpacedRep.Cards.Card do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias SpacedRep.Answers.Answer
+  alias SpacedRep.Decks.Deck
+
   @derive {Jason.Encoder,
            only: [:id, :question, :answers, :inserted_at, :updated_at, :deleted_at]}
 
@@ -18,10 +21,14 @@ defmodule SpacedRep.Cards.Card do
 
     field(:next_practice_date, :utc_datetime)
     field :deleted_at, :utc_datetime
-    has_many :answers, SpacedRep.Answers.Answer
-    belongs_to :deck, SpacedRep.Decks.Deck
+    has_many :answers, Answer, defaults: :set_user_id
+    belongs_to :deck, Deck
 
     timestamps()
+  end
+
+  def set_user_id(%Answer{} = answer, %__MODUE__{} = card) do
+    %{answer | user_id: card.user_id}
   end
 
   @doc false

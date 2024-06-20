@@ -2,7 +2,6 @@ defmodule SpacedRep.DecksTest do
   use SpacedRep.DataCase
 
   alias SpacedRep.Decks
-  alias SpacedRep.Decks.Deck
   import SpacedRep.Factory
 
   @user_id Ecto.UUID.generate()
@@ -29,7 +28,13 @@ defmodule SpacedRep.DecksTest do
     test "when input data is valid" do
       valid_data = %{
         "name" => "some name",
-        "description" => "some description"
+        "description" => "some description",
+        "cards" => [
+          %{
+            "question" => "Comment ça va?",
+            "answers" => [%{"content" => "How are you?"}, %{"content" => "How is it going?"}]
+          }
+        ]
       }
 
       created_deck = create_deck(valid_data)
@@ -43,7 +48,7 @@ defmodule SpacedRep.DecksTest do
 
       created_deck = create_deck(invalid_data)
 
-      assert match?(created_deck, nil)
+      assert match?(^created_deck, nil)
     end
   end
 
@@ -83,7 +88,7 @@ defmodule SpacedRep.DecksTest do
   end
 
   defp setup_deck() do
-    insert(:deck, %{user_id: @user_id})
+    insert(:deck, %{user_id: @user_id}) |> reset_fields([:cards])
   end
 
   defp create_deck(data) do

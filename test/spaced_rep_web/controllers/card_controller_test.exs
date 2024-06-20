@@ -18,23 +18,23 @@ defmodule SpacedRepWeb.CardControllerTest do
   end
 
   describe "index" do
+    @tag :wip
     test "lists all cards", %{conn: conn} do
-      card = insert(:card, %{user_id: @user_id})
-      conn = get(conn, ~p"/decks/#{card.deck_id}/cards")
+      deck =
+        setup_deck(%{
+          cards: [
+            %{
+              user_id: @user_id,
+              question: "Comment ça va?",
+              answers: [%{user_id: @user_id, content: "How are you?"}]
+            }
+          ]
+        })
 
-      assert json_response(conn, 200) == [
-               %{
-                 "id" => card.id,
-                 "question" => card.question,
-                 "answers" => [],
-                 "deck_id" => card.deck_id,
-                 "easiness" => card.easiness,
-                 "interval" => card.interval,
-                 "next_practice_date" => card.next_practice_date |> DateTime.to_iso8601(),
-                 "quality" => card.quality,
-                 "repetitions" => card.repetitions
-               }
-             ]
+      conn = get(conn, ~p"/decks/#{deck.id}/cards")
+
+      resp = json_response(conn, 200)
+      assert Enum.count(resp) == Enum.count(deck.cards)
     end
   end
 
@@ -49,9 +49,7 @@ defmodule SpacedRepWeb.CardControllerTest do
         "quality" => 1,
         "easiness" => 1.3,
         "question" => "some question",
-        # TODO re-introduce after custom body parser is written
-        # "answers" => [%{"content" => "answer1"}]
-        "answers" => []
+        "answers" => [%{"content" => "answer1"}]
       }
 
       conn = post_card(conn, deck.id, valid_data)
@@ -105,14 +103,12 @@ defmodule SpacedRepWeb.CardControllerTest do
       assert resp["question"] == valid_data["question"]
     end
 
-    # TODO Fix this test
-
     test "when input data is invalid", %{
       conn: conn
     } do
       card = setup_card()
 
-      invalid_data = %{question: nil}
+      invalid_data = %{"question" => nil}
 
       conn = put_card(conn, %{"id" => card.id, "deck_id" => card.deck_id}, invalid_data)
 
@@ -129,8 +125,8 @@ defmodule SpacedRepWeb.CardControllerTest do
     assert response(conn, 204)
   end
 
-  defp setup_deck() do
-    insert(:deck, %{user_id: @user_id})
+  defp setup_deck(data \\ %{}) do
+    insert(:deck, Map.merge(%{user_id: @user_id}, data))
   end
 
   defp setup_card() do

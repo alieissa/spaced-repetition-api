@@ -1,6 +1,9 @@
 defmodule SpacedRep.Decks.Deck do
   use Ecto.Schema
   import Ecto.Changeset
+  require Logger
+
+  alias SpacedRep.Cards.Card
 
   @derive {Jason.Encoder,
            only: [:id, :name, :description, :cards, :inserted_at, :updated_at, :deleted_at]}
@@ -13,9 +16,14 @@ defmodule SpacedRep.Decks.Deck do
     field :description, :string
     field :user_id, :binary_id
     field :deleted_at, :utc_datetime
-    has_many :cards, SpacedRep.Cards.Card
+
+    has_many :cards, Card, defaults: :set_user_id
 
     timestamps()
+  end
+
+  def set_user_id(%Card{} = card, %__MODULE__{} = deck) do
+    %{card | user_id: deck.user_id}
   end
 
   @doc """

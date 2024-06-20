@@ -11,7 +11,7 @@ defmodule SpacedRep.AnswersTest do
 
     loaded_answers = load_answers(answer.card_id)
 
-    assert loaded_answers = [answer]
+    assert loaded_answers == [answer]
   end
 
   test "get_answer/1" do
@@ -38,7 +38,7 @@ defmodule SpacedRep.AnswersTest do
       invalid_data = %{"content" => nil}
       created_answer = create_answer(card.id, invalid_data)
 
-      assert match?(created_answer, nil)
+      assert match?(^created_answer, nil)
     end
   end
 
@@ -86,7 +86,7 @@ defmodule SpacedRep.AnswersTest do
     Answers.get_answer(%{"id" => id, "user_id" => @user_id})
   end
 
-  defp create_answer(card_id, data \\ %{content: "some content"}) do
+  defp create_answer(card_id, data) do
     Answers.create_answer(%{"user_id" => @user_id, "card_id" => card_id}, data)
 
     case Answers.list_answers(%{"user_id" => @user_id, "card_id" => card_id}) do
@@ -96,7 +96,7 @@ defmodule SpacedRep.AnswersTest do
     end
   end
 
-  defp update_answer(id, data \\ %{}) do
+  defp update_answer(id, data) do
     Answers.update_answer(%{"id" => id, "user_id" => @user_id}, data)
     Answers.get_answer(%{"id" => id, "user_id" => @user_id})
   end

@@ -2,7 +2,6 @@ defmodule SpacedRepWeb.AnswerControllerTest do
   use SpacedRepWeb.ConnCase
 
   import SpacedRep.Factory
-  alias SpacedRep.Answers.Answer
 
   alias SpacedRep.TestUtils, as: Utils
 
@@ -134,7 +133,7 @@ defmodule SpacedRepWeb.AnswerControllerTest do
     end
   end
 
-  defp setup_card(data \\ %{}) do
+  defp setup_card() do
     insert(:card, %{user_id: @user_id})
   end
 
@@ -160,10 +159,5 @@ defmodule SpacedRepWeb.AnswerControllerTest do
 
   defp delete_answer(conn, %{"deck_id" => deck_id, "card_id" => card_id, "id" => id}) do
     delete(conn, ~p"/decks/#{deck_id}/cards/#{card_id}/answers/#{id}")
-  end
-
-  defp create_answer(_) do
-    answer = insert(:answer, %{user_id: @user_id})
-    %{answer: answer}
   end
 end

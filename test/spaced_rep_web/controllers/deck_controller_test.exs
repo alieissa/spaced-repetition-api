@@ -28,16 +28,24 @@ defmodule SpacedRepWeb.DeckControllerTest do
   end
 
   describe "POST /decks" do
+    @tag :wip
     test "when input data is valid", %{conn: conn} do
       valid_data = %{
-        "name" => "some name",
-        "description" => "some description"
+        "name" => "Français",
+        "description" => "French terms",
+        "cards" => [
+          %{
+            "question" => "Comment ça va?",
+            "answers" => [%{"content" => "How are you?"}, %{"content" => "How is it going?"}]
+          }
+        ]
       }
 
       conn = post_deck(conn, valid_data)
 
       resp = json_response(conn, 201)
       assert resp["description"] == valid_data["description"]
+      assert Enum.count(resp["cards"]) == Enum.count(valid_data["cards"])
     end
 
     test "when input data is invalid", %{conn: conn} do
