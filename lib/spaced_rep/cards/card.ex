@@ -27,7 +27,7 @@ defmodule SpacedRep.Cards.Card do
     timestamps()
   end
 
-  def set_user_id(%Answer{} = answer, %__MODUE__{} = card) do
+  def set_user_id(%Answer{} = answer, %__MODULE__{} = card) do
     %{answer | user_id: card.user_id}
   end
 
