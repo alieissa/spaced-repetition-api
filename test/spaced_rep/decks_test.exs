@@ -107,8 +107,8 @@ defmodule SpacedRep.DecksTest do
   end
 
   defp delete_deck(id) do
-    Decks.delete_deck(%{"id" => id, "user_id" => @user_id})
-    Decks.get_deck(%{"id" => id, "user_id" => @user_id})
+    {:ok, deck} = Decks.delete_deck(%{"id" => id, "user_id" => @user_id})
+    deck
   end
 
   defp reset_cards_field(deck) do

@@ -37,7 +37,9 @@ defmodule SpacedRep.Answers do
 
   """
   def get_answer(%{"id" => id, "user_id" => user_id}) do
-    query = from a in Answer, where: a.id == ^id and a.user_id == ^user_id
+    query =
+      from a in Answer, where: a.id == ^id and a.user_id == ^user_id and is_nil(a.deleted_at)
+
     Repo.one(query)
   end
 

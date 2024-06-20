@@ -40,7 +40,7 @@ defmodule SpacedRep.Cards do
 
   """
   def get_card(%{"id" => id, "user_id" => user_id}) do
-    query = from c in Card, where: c.id == ^id and c.user_id == ^user_id
+    query = from c in Card, where: c.id == ^id and c.user_id == ^user_id and is_nil(c.deleted_at)
     query |> Repo.one() |> Repo.preload(:answers)
   end
 
@@ -61,19 +61,6 @@ defmodule SpacedRep.Cards do
     |> Card.changeset(attrs)
     |> Repo.insert()
   end
-
-  # def update_card(%{"id" => id, "user_id" => user_id}, %{"quality" => quality} = attrs)
-  #     when is_nil(quality)
-  #     # TODO Do DB query for card here, then compare quality
-  #     when quality !== card.quality do
-  #   card = get_card(%{"id" => id, "user_id" => user_id})
-
-  #   updated_attrs = get_updated_card(card, attrs)
-
-  #   card
-  #   |> Card.changeset(updated_attrs)
-  #   |> Repo.update()
-  # end
 
   @doc """
   Updates a card.

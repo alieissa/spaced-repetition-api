@@ -102,7 +102,7 @@ defmodule SpacedRep.AnswersTest do
   end
 
   defp delete_answer(id) do
-    Answers.delete_answer(%{"id" => id, "user_id" => @user_id})
-    Answers.get_answer(%{"id" => id, "user_id" => @user_id})
+    {:ok, answer} = Answers.delete_answer(%{"id" => id, "user_id" => @user_id})
+    answer
   end
 end

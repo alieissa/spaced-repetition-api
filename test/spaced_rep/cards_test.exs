@@ -190,7 +190,7 @@ defmodule SpacedRep.CardsTest do
   end
 
   defp delete_card(id) do
-    Cards.delete_card(%{"id" => id, "user_id" => @user_id})
-    Cards.get_card(%{"id" => id, "user_id" => @user_id})
+    {:ok, card} = Cards.delete_card(%{"id" => id, "user_id" => @user_id})
+    card
   end
 end

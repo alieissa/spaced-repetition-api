@@ -42,7 +42,7 @@ defmodule SpacedRep.Decks do
 
   """
   def get_deck(%{"id" => id, "user_id" => user_id}) do
-    query = from d in Deck, where: d.id == ^id and d.user_id == ^user_id
+    query = from d in Deck, where: d.id == ^id and d.user_id == ^user_id and is_nil(d.deleted_at)
     query |> Repo.one() |> Repo.preload(cards: [:answers])
   end
 
