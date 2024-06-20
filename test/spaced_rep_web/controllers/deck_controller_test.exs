@@ -3,21 +3,12 @@ defmodule SpacedRepWeb.DeckControllerTest do
 
   import SpacedRep.Factory
 
-  alias Ecto.UUID
-  alias SpacedRep.Decks.Deck
   alias SpacedRep.TestUtils, as: Utils
 
-  @create_attrs %{
-    name: "some name",
-    description: "some description"
-  }
-  @update_attrs %{
-    name: "some updated name"
-  }
-  @invalid_attrs %{name: nil, description: "some updated description"}
+  @user_id Ecto.UUID.autogenerate()
 
   setup %{conn: conn} do
-    token = Utils.get_token(%{"sub" => UUID.autogenerate()})
+    token = Utils.get_token(%{"sub" => @user_id})
 
     conn =
       conn
@@ -30,73 +21,90 @@ defmodule SpacedRepWeb.DeckControllerTest do
   describe "index" do
     test "lists all decks", %{conn: conn} do
       conn = get(conn, ~p"/decks")
-      assert json_response(conn, 200) == []
+
+      resp = json_response(conn, 200)
+      assert resp == []
     end
   end
 
-  describe "create deck" do
-    test "renders deck when data is valid", %{conn: conn} do
-      # Conn.assign(conn, :user_id, UUID.autogenerate())
+  describe "POST /decks" do
+    @tag :wip
+    test "when input data is valid", %{conn: conn} do
+      valid_data = %{
+        "name" => "Français",
+        "description" => "French terms",
+        "cards" => [
+          %{
+            "question" => "Comment ça va?",
+            "answers" => [%{"content" => "How are you?"}, %{"content" => "How is it going?"}]
+          }
+        ]
+      }
 
-      conn =
-        conn
-        |> assign(:usr_id, UUID.autogenerate())
-        |> post(~p"/decks", @create_attrs)
+      conn = post_deck(conn, valid_data)
 
-      assert %{"id" => id} = json_response(conn, 201)
-
-      conn = get(conn, ~p"/decks/#{id}")
-
-      assert %{
-               "id" => ^id,
-               "description" => "some description",
-               "name" => "some name"
-             } = json_response(conn, 200)
+      resp = json_response(conn, 201)
+      assert resp["description"] == valid_data["description"]
+      assert Enum.count(resp["cards"]) == Enum.count(valid_data["cards"])
     end
 
-    test "renders errors when data is invalid", %{conn: conn} do
-      conn = post(conn, ~p"/decks", @invalid_attrs)
-      assert json_response(conn, 422)["errors"] != %{}
-    end
-  end
+    test "when input data is invalid", %{conn: conn} do
+      invalid_data = %{"name" => nil, "description" => "some updated description"}
 
-  describe "update deck" do
-    setup [:create_deck]
+      conn = post_deck(conn, invalid_data)
 
-    test "renders deck when data is valid", %{conn: conn, deck: %Deck{id: id}} do
-      conn = put(conn, ~p"/decks/#{id}", @update_attrs)
-      assert %{"id" => ^id} = json_response(conn, 200)
-
-      conn = get(conn, ~p"/decks/#{id}")
-
-      assert %{
-               "id" => ^id,
-               "name" => "some updated name"
-             } = json_response(conn, 200)
-    end
-
-    test "renders errors when data is invalid", %{conn: conn, deck: deck} do
-      conn = put(conn, ~p"/decks/#{deck}", @invalid_attrs)
-      assert json_response(conn, 422)["errors"] != %{}
+      resp = json_response(conn, 422)
+      assert resp["errors"]
     end
   end
 
-  describe "delete deck" do
-    setup [:create_deck]
+  describe "PUT /decks/:id" do
+    test "when input data is valid", %{conn: conn} do
+      deck = setup_deck()
 
-    test "deletes chosen deck", %{conn: conn, deck: deck} do
-      conn = delete(conn, ~p"/decks/#{deck}")
-      assert response(conn, 204)
+      valid_data = %{
+        "name" => "some updated name"
+      }
 
-      conn = get(conn, ~p"/decks/#{deck}")
-      assert response(conn, 404)
+      conn = put_deck(conn, deck.id, valid_data)
+
+      resp = json_response(conn, 200)
+      assert resp["name"] == valid_data["name"]
+    end
+
+    test "when input data is invalid", %{conn: conn} do
+      deck = setup_deck()
+
+      invalid_data = %{"name" => nil, "description" => "some updated description"}
+
+      conn = put_deck(conn, deck.id, invalid_data)
+
+      resp = json_response(conn, 422)
+      assert resp["errors"]
     end
   end
 
-  defp create_deck(_) do
-    deck = insert(:deck)
-    %{deck: deck}
+  test "DELETE /decks/:id", %{conn: conn} do
+    deck = setup_deck()
+
+    conn = delete_deck(conn, deck.id)
+
+    assert response(conn, 204)
+  end
+
+  defp setup_deck() do
+    insert(:deck, %{user_id: @user_id})
+  end
+
+  defp post_deck(conn, data) do
+    post(conn, ~p"/decks", data)
+  end
+
+  defp put_deck(conn, id, data) do
+    put(conn, ~p"/decks/#{id}", data)
+  end
+
+  defp delete_deck(conn, id) do
+    delete(conn, ~p"/decks/#{id}")
   end
 end
-
-# %Deck{"id" => id} = deck

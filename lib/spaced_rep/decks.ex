@@ -15,15 +15,16 @@ defmodule SpacedRep.Decks do
 
   ## Examples
 
-      iex> list_decks()
+      iex> list_decks(123)
       [%Deck{}, ...]
 
-      iex> list_decks()
+      iex> list_decks(456)
       nil
 
   """
-  def list_decks do
-    Deck |> Repo.all() |> Repo.preload(cards: [:answers])
+  def list_decks(user_id) do
+    query = from d in Deck, where: d.user_id == ^user_id and is_nil(d.deleted_at)
+    query |> Repo.all() |> Repo.preload(cards: [:answers])
   end
 
   @doc """
@@ -33,17 +34,16 @@ defmodule SpacedRep.Decks do
 
   ## Examples
 
-      iex> get_deck(123)
+      iex> get_deck(%{"id" => 123, "user_id" => 456})
       %Deck{}
 
-      iex> get_deck(456)
+      iex> get_deck(%{"id" => 123, "user_id" => 789})
       nil
 
   """
-  def get_deck(id) do
-    query = from d in Deck, where: is_nil(d.deleted_at) and d.id == ^id
-
-    Repo.one(query) |> Repo.preload(cards: [:answers])
+  def get_deck(%{"id" => id, "user_id" => user_id}) do
+    query = from d in Deck, where: d.id == ^id and d.user_id == ^user_id and is_nil(d.deleted_at)
+    query |> Repo.one() |> Repo.preload(cards: [:answers])
   end
 
   @doc """
@@ -51,16 +51,16 @@ defmodule SpacedRep.Decks do
 
   ## Examples
 
-      iex> create_deck(%{field: value})
+      iex> create_deck(%{"name"=> "new deck"})
       {:ok, %Deck{}}
 
-      iex> create_deck(%{field: bad_value})
+      iex> create_deck(%{"name" => nil})
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_deck(user_id, attrs \\ %{}) do
-    %Deck{}
-    |> Deck.changeset(user_id, attrs)
+  def create_deck(%{"user_id" => user_id}, attrs \\ %{}) do
+    %Deck{user_id: user_id}
+    |> Deck.changeset(attrs)
     |> Repo.insert()
     |> case do
       {:ok, deck} -> {:ok, Repo.preload(deck, cards: [:answers])}
@@ -73,15 +73,15 @@ defmodule SpacedRep.Decks do
 
   ## Examples
 
-      iex> update_deck(deck, %{field: new_value})
+      iex> update_deck(%{"id" => 123, "user_id" => 456}, %{"name" => "updated name"})
       {:ok, %Deck{}}
 
-      iex> update_deck(deck, %{field: bad_value})
+      iex> update_deck(%{"id" => 123, "user_id" => 456}, %{"name" => nil})
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_deck(%Deck{} = deck, attrs) do
-    deck
+  def update_deck(%{"id" => id, "user_id" => user_id}, attrs) do
+    get_deck(%{"id" => id, "user_id" => user_id})
     |> Deck.changeset(attrs)
     ## TODO Upsert nested cards and answers
     |> Repo.update()
@@ -96,14 +96,14 @@ defmodule SpacedRep.Decks do
 
   ## Examples
 
-      iex> upload_decks(decks, user_id)
-      {:ok, %Deck{}}
+      iex> upload_decks([%{"user_id" => 123, "name" => "new deck"}])
+      {:ok, [%Deck{}]}
 
-      iex> upload_decks(decks, user_id)
+      iex> upload_decks([%{"user_id" => 123, "name" => nil}])
       {:error, %Ecto.Changeset{}}
 
   """
-  def upload_decks(decks, user_id) do
+  def upload_decks(decks) do
     mapped_decks = Enum.map(decks, &map_imported_deck/1)
 
     ops =
@@ -111,7 +111,7 @@ defmodule SpacedRep.Decks do
         Ecto.Multi.insert(
           acc,
           deck.name,
-          Deck.changeset(deck, user_id, %{})
+          Deck.changeset(%Deck{}, deck)
         )
       end)
 
@@ -123,17 +123,15 @@ defmodule SpacedRep.Decks do
 
   ## Examples
 
-      iex> delete_deck(deck)
-      {:ok, %Deck{}}
+      iex> delete_deck(%{"id" => 123, "user_id" => 456})
+      {:ok, %Deck{deleted_at: 01/01/1970}}
 
-      iex> delete_deck(deck)
+      iex> delete_deck(%{"id" => 123, "user_id" => 678})
       {:error, %Ecto.Changeset{}}
 
   """
-  def delete_deck(id) do
-    %Deck{id: id}
-    |> change_deck(%{deleted_at: DateTime.utc_now()})
-    |> Repo.update()
+  def delete_deck(%{"id" => id, "user_id" => user_id}) do
+    update_deck(%{"id" => id, "user_id" => user_id}, %{"deleted_at" => DateTime.utc_now()})
   end
 
   @doc """
@@ -145,14 +143,13 @@ defmodule SpacedRep.Decks do
       %Ecto.Changeset{data: %Deck{}}
 
   """
-  def change_deck(%Deck{} = deck, attrs \\ %{}) do
+  def change_deck(deck, attrs \\ %{}) do
     Deck.changeset(deck, attrs)
   end
 
-  """
+  @doc """
   Maps a list of %ImportedDeck{} to a list of %Deck{}
   """
-
   defp map_imported_deck(%{"name" => name, "cards" => imported_cards}) do
     map_answers = fn answers ->
       Enum.map(answers, fn answer -> %Answer{content: answer} end)

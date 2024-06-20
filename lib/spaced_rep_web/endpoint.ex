@@ -1,7 +1,8 @@
 defmodule SpacedRepWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :spaced_rep
 
-  plug SpacedRepWeb.Plug
+  plug SpacedRepWeb.Plugs.HealthCheck
+  plug SpacedRepWeb.Plugs.UserID
 
   # The session will be stored in the cookie and signed,
   # this means its contents can be read but not tampered with.

@@ -12,34 +12,38 @@ defmodule SpacedRepWeb.CardController do
   end
 
   def index(conn, %{"deck_id" => deck_id}, _) do
-    cards = Cards.list_cards(deck_id)
+    cards = Cards.list_cards(%{"user_id" => conn.assigns.user_id, "deck_id" => deck_id})
     render(conn, :index, cards: cards)
   end
 
   def create(conn, %{"deck_id" => deck_id}, card_params) do
-    with {:ok, %Card{} = card} <- Cards.create_card(deck_id, card_params) do
+    with {:ok, %Card{} = card} <-
+           Cards.create_card(
+             %{"user_id" => conn.assigns.user_id, "deck_id" => deck_id},
+             card_params
+           ) do
       conn
       |> put_status(:created)
-      |> put_resp_header("location", ~p"/decks/#{deck_id}/cards/#{card}")
+      |> put_resp_header("location", ~p"/decks/#{deck_id}/cards/#{card.id}")
       |> render(:show, card: card)
     end
   end
 
   def show(conn, %{"id" => id}, _) do
-    with %Card{} = card <- Cards.get_card(id) do
+    with %Card{} = card <- Cards.get_card(%{"id" => id, "user_id" => conn.assigns.user_id}) do
       render(conn, :show, card: card)
     end
   end
 
   def update(conn, %{"id" => id}, card_params) do
-    with %Card{} = card <- Cards.get_card(id),
-         {:ok, %Card{} = updated_card} <- Cards.update_card(card, card_params) do
+    with {:ok, %Card{} = updated_card} <-
+           Cards.update_card(%{"id" => id, "user_id" => conn.assigns.user_id}, card_params) do
       render(conn, :show, card: updated_card)
     end
   end
 
   def delete(conn, %{"id" => id}, _) do
-    with {:ok, %Card{}} <- Cards.delete_card(id) do
+    with {:ok, %Card{}} <- Cards.delete_card(%{"id" => id, "user_id" => conn.assigns.user_id}) do
       send_resp(conn, :no_content, "")
     end
   end

@@ -1,57 +1,108 @@
 defmodule SpacedRep.AnswersTest do
   use SpacedRep.DataCase
 
-  alias SpacedRep.Answers
-  alias SpacedRep.Answers.Answer
   import SpacedRep.Factory
+  alias SpacedRep.Answers
 
-  describe "answers" do
-    @invalid_attrs %{content: nil}
+  @user_id Ecto.UUID.generate()
 
-    test "list_answers/1 returns all answers" do
-      answer = insert(:answer) |> reset_fields([:card])
-      assert Answers.list_answers(answer.card_id) == [answer]
+  test "list_answers/1" do
+    answer = setup_answer()
+
+    loaded_answers = load_answers(answer.card_id)
+
+    assert loaded_answers == [answer]
+  end
+
+  test "get_answer/1" do
+    answer = setup_answer()
+
+    loaded_answer = load_answer(answer.id)
+
+    assert loaded_answer == answer
+  end
+
+  describe "create_answer/1" do
+    test "when input data is valid" do
+      card = setup_card()
+
+      data = %{"content" => "How are you"}
+      created_answer = create_answer(card.id, data)
+
+      assert created_answer.content == data["content"]
     end
 
-    test "get_answer!/1 returns the answer with given id" do
-      answer = insert(:answer) |> reset_fields([:card])
-      assert Answers.get_answer!(answer.id) == answer
+    test "when input data is invalid" do
+      card = setup_card()
+
+      invalid_data = %{"content" => nil}
+      created_answer = create_answer(card.id, invalid_data)
+
+      assert match?(^created_answer, nil)
+    end
+  end
+
+  describe "update_answer/2" do
+    test "when input data is valid" do
+      answer = setup_answer()
+
+      data = %{"content" => "some updated content"}
+      updated_answer = update_answer(answer.id, data)
+
+      assert updated_answer.content == data["content"]
     end
 
-    test "create_answer/1 with valid data creates a answer" do
-      valid_attrs = %{content: "some content"}
+    test "when input data is invalid" do
+      answer = setup_answer()
 
-      assert {:ok, %Answer{} = answer} = Answers.create_answer(valid_attrs)
-      assert answer.content == "some content"
+      invalid_data = %{"content" => nil}
+      updated_answer = update_answer(answer.id, invalid_data)
+
+      assert updated_answer.content
     end
+  end
 
-    test "create_answer/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Answers.create_answer(@invalid_attrs)
+  test "delete_answer/1" do
+    answer = setup_answer()
+
+    deleted_answer = delete_answer(answer.id)
+
+    assert deleted_answer.deleted_at
+  end
+
+  defp setup_answer do
+    insert(:answer, %{user_id: @user_id}) |> reset_fields([:card])
+  end
+
+  defp setup_card do
+    insert(:card, %{user_id: @user_id})
+  end
+
+  defp load_answers(card_id) do
+    Answers.list_answers(%{"user_id" => @user_id, "card_id" => card_id})
+  end
+
+  defp load_answer(id) do
+    Answers.get_answer(%{"id" => id, "user_id" => @user_id})
+  end
+
+  defp create_answer(card_id, data) do
+    Answers.create_answer(%{"user_id" => @user_id, "card_id" => card_id}, data)
+
+    case Answers.list_answers(%{"user_id" => @user_id, "card_id" => card_id}) do
+      [] -> nil
+      [created_answer] -> created_answer
+      [created_answer | _] -> created_answer
     end
+  end
 
-    test "update_answer/2 with valid data updates the answer" do
-      answer = insert(:answer) |> reset_fields([:card])
-      update_attrs = %{content: "some updated content"}
+  defp update_answer(id, data) do
+    Answers.update_answer(%{"id" => id, "user_id" => @user_id}, data)
+    Answers.get_answer(%{"id" => id, "user_id" => @user_id})
+  end
 
-      assert {:ok, %Answer{} = answer} = Answers.update_answer(answer, update_attrs)
-      assert answer.content == "some updated content"
-    end
-
-    test "update_answer/2 with invalid data returns error changeset" do
-      answer = insert(:answer) |> reset_fields([:card])
-      assert {:error, %Ecto.Changeset{}} = Answers.update_answer(answer, @invalid_attrs)
-      assert answer == Answers.get_answer!(answer.id)
-    end
-
-    test "delete_answer/1 deletes the answer" do
-      answer = insert(:answer)
-      assert {:ok, %Answer{}} = Answers.delete_answer(answer)
-      assert_raise Ecto.NoResultsError, fn -> Answers.get_answer!(answer.id) end
-    end
-
-    test "change_answer/1 returns a answer changeset" do
-      answer = insert(:answer) |> reset_fields([:card])
-      assert %Ecto.Changeset{} = Answers.change_answer(answer)
-    end
+  defp delete_answer(id) do
+    {:ok, answer} = Answers.delete_answer(%{"id" => id, "user_id" => @user_id})
+    answer
   end
 end

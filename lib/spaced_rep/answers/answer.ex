@@ -10,12 +10,23 @@ defmodule SpacedRep.Answers.Answer do
   @timestamps_opts [type: :utc_datetime]
   schema "answers" do
     field :content, :string
+    field :user_id, :binary_id
+    field :deleted_at, :utc_datetime
     belongs_to :card, SpacedRep.Cards.Card
 
     timestamps()
   end
 
-  @doc false
+  @doc """
+  Delete answer changeset
+  """
+  def changeset(answer, %{"deleted_at" => _deleted_at} = attrs) do
+    answer |> cast(attrs, [:deleted_at])
+  end
+
+  @doc """
+  Update answer changeset
+  """
   def changeset(answer, attrs) do
     answer
     |> cast(attrs, [:content])

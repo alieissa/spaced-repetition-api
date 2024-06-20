@@ -1,6 +1,9 @@
 defmodule SpacedRep.Decks.Deck do
   use Ecto.Schema
   import Ecto.Changeset
+  require Logger
+
+  alias SpacedRep.Cards.Card
 
   @derive {Jason.Encoder,
            only: [:id, :name, :description, :cards, :inserted_at, :updated_at, :deleted_at]}
@@ -13,30 +16,42 @@ defmodule SpacedRep.Decks.Deck do
     field :description, :string
     field :user_id, :binary_id
     field :deleted_at, :utc_datetime
-    has_many :cards, SpacedRep.Cards.Card
+
+    has_many :cards, Card, defaults: :set_user_id
 
     timestamps()
   end
 
-  def changeset(deck, user_id, attrs) do
+  def set_user_id(%Card{} = card, %__MODULE__{} = deck) do
+    %{card | user_id: deck.user_id}
+  end
+
+  @doc """
+  Delete deck changeset
+  """
+  def changeset(deck, %{"deleted_at" => _deleted_at} = attrs) do
     deck
-    |> change(%{user_id: user_id})
-    |> cast(attrs, [:description, :name, :user_id])
-    |> validate_required([:name])
+    |> cast(attrs, [:deleted_at])
+  end
+
+  @doc """
+  Update deck changeset
+  """
+  def changeset(deck, %{id: _id} = attrs) do
+    deck
+    |> change(attrs)
     |> unique_constraint(:name)
     |> cast_assoc(:cards)
   end
 
-  def changeset(deck, %{deleted_at: _deleted_at} = attrs) do
-    deck
-    |> change(attrs)
-    |> cast(attrs, [:deleted_at])
-  end
-
+  @doc """
+  Create deck changeset
+  """
   def changeset(deck, attrs) do
     deck
-    |> cast(attrs, [:description, :name])
-    |> validate_required([:name])
+    |> cast(attrs, [:description, :name, :user_id])
+    |> validate_required([:name, :user_id])
+    |> unique_constraint(:name)
     |> cast_assoc(:cards)
   end
 end

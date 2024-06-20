@@ -17,8 +17,11 @@ defmodule SpacedRep.Cards do
       [%Card{}, ...]
 
   """
-  def list_cards(deck_id) do
-    query = from(c in Card, where: c.deck_id == ^deck_id)
+  def list_cards(%{"user_id" => user_id, "deck_id" => deck_id}) do
+    query =
+      from c in Card,
+        where: c.deck_id == ^deck_id and c.user_id == ^user_id and is_nil(c.deleted_at)
+
     Repo.all(query) |> Repo.preload(:answers)
   end
 
@@ -29,17 +32,16 @@ defmodule SpacedRep.Cards do
 
   ## Examples
 
-      iex> get_card!(123)
+      iex> get_card({"id" => 123, "user_id": 456})
       %Card{}
 
-      iex> get_card(456)
+      iex> get_card({"id" => 123, "user_id": 678})
       ** nil
 
   """
-  def get_card(id) do
-    query = from c in Card, where: is_nil(c.deleted_at) and c.id == ^id
-
-    Repo.one(query) |> Repo.preload(:answers)
+  def get_card(%{"id" => id, "user_id" => user_id}) do
+    query = from c in Card, where: c.id == ^id and c.user_id == ^user_id and is_nil(c.deleted_at)
+    query |> Repo.one() |> Repo.preload(:answers)
   end
 
   @doc """
@@ -47,20 +49,58 @@ defmodule SpacedRep.Cards do
 
   ## Examples
 
-      iex> create_card(%{field: value})
+      iex> create_card(%{"user_id" => 123, "deck_id" => 456}, %{"question"=> "How are you?"})
       {:ok, %Card{}}
 
-      iex> create_card(%{field: bad_value})
+      iex> create_card(%{"user_id" => 123, "deck_id" => 456}, %{"question"=> nil})
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_card(deck_id, attrs \\ %{}) do
-    %Card{}
-    |> Card.changeset(deck_id, attrs)
+  def create_card(%{"user_id" => user_id, "deck_id" => deck_id}, attrs) do
+    %Card{user_id: user_id, deck_id: deck_id}
+    |> Card.changeset(attrs)
     |> Repo.insert()
   end
 
-  defp get_updated_card(card, %{"quality" => quality} = attrs) do
+  @doc """
+  Updates a card.
+
+  ## Examples
+
+      iex> update_card(%{"id" => 123, "user_id" => 456}, %{"question" => "Comment ça va?"})
+      {:ok, %Card{}}
+
+      iex> update_card(%{"id" => 123, "user_id" => 456}, %{"question" => nil})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_card(%{"id" => id, "user_id" => user_id}, attrs) do
+    card = get_card(%{"id" => id, "user_id" => user_id})
+    updated_attrs = get_updated_attrs(card, attrs)
+
+    card
+    |> Card.changeset(updated_attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a card.
+
+  ## Examples
+
+      iex> delete_card(%{"id" => 123, "user_id" => 456})
+      {:ok, %Card{}}
+
+      iex> delete_card(%{"id" => 123, "user_id" => 789})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_card(%{"id" => id, "user_id" => user_id}) do
+    update_card(%{"id" => id, "user_id" => user_id}, %{"deleted_at" => DateTime.utc_now()})
+  end
+
+  defp get_updated_attrs(%Card{} = card, %{"quality" => quality} = attrs)
+       when is_number(quality) and card.quality !== quality do
     dq = 5 - quality
     updated_easiness = max(1.3, card.easiness + (0.1 - dq * (0.08 + dq * 0.02)))
     updated_easiness = Float.round(updated_easiness, 1)
@@ -93,62 +133,7 @@ defmodule SpacedRep.Cards do
     )
   end
 
-  def update_card(%Card{} = card, %{"quality" => quality} = attrs)
-      when quality !== card.quality do
-    updated_attrs = get_updated_card(card, attrs)
-
-    card
-    |> Card.changeset(updated_attrs)
-    |> Repo.update()
-  end
-
-  @doc """
-  Updates a card.
-
-  ## Examples
-
-      iex> update_card(card, %{field: new_value})
-      {:ok, %Card{}}
-
-      iex> update_card(card, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-
-  def update_card(%Card{} = card, attrs) do
-    card
-    |> Card.changeset(attrs)
-    |> Repo.update()
-  end
-
-  @doc """
-  Deletes a card.
-
-  ## Examples
-
-      iex> delete_card(card)
-      {:ok, %Card{}}
-
-      iex> delete_card(card)
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def delete_card(id) do
-    %Card{id: id}
-    |> change_card(%{deleted_at: DateTime.utc_now()})
-    |> Repo.update()
-  end
-
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking card changes.
-
-  ## Examples
-
-      iex> change_card(card)
-      %Ecto.Changeset{data: %Card{}}
-
-  """
-  def change_card(%Card{} = card, attrs \\ %{}) do
-    Card.changeset(card, attrs)
+  defp get_updated_attrs(%Card{}, attrs) do
+    attrs
   end
 end

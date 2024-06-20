@@ -1,15 +1,11 @@
-defmodule SpacedRepWeb.HealthCheckControllerTest do
+defmodule SpacedRepWeb.UserIDTest do
   use SpacedRepWeb.ConnCase
 
   alias SpacedRep.TestUtils, as: Utils
 
+  @user_id Ecto.UUID.generate()
+
   describe "index" do
-    test "health", %{conn: conn} do
-      conn = get(conn, ~p"/health")
-
-      assert "healthy" = response(conn, 200)
-    end
-
     test "request without authorization token", %{conn: conn} do
       conn =
         conn
@@ -31,14 +27,14 @@ defmodule SpacedRepWeb.HealthCheckControllerTest do
     end
 
     test "request with valid token", %{conn: conn} do
-      token = Utils.get_token(%{"sub" => "dummy_user_id"})
+      token = Utils.get_token(%{"sub" => @user_id})
 
       conn =
         conn
         |> put_req_header("authorization", "bearer #{token}")
         |> get(~p"/decks")
 
-      assert conn.assigns.user_id == "dummy_user_id"
+      assert conn.assigns.user_id == @user_id
     end
   end
 end
